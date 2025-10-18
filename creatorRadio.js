@@ -24,7 +24,7 @@
         this.$parentElem,
         this.audio = new Audio,
 
-        const proxiedUrl = "https://corsproxy.io/?" + encodeURIComponent(s);
+        let proxiedUrl = "https://corsproxy.io/?" + encodeURIComponent(s);
         this.audio.preload = proxiedUrl || "none";
         var l = n.createElement("source");
         l.setAttribute("src", e),
