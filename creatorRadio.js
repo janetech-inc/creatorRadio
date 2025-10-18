@@ -17,14 +17,13 @@
     };
     function a(t, e, i, r, a, s) {
         var u = this;
+        let proxiedUrl = "https://corsproxy.io/?" + encodeURIComponent(s);
         this.id = o(),
         this.$elem = i,
         this.targetSetId = r,
         this.$elem.attr("data-true-audio-player-song-id", this.id),
         this.$parentElem,
         this.audio = new Audio,
-
-        let proxiedUrl = "https://corsproxy.io/?" + encodeURIComponent(s);
         this.audio.preload = proxiedUrl || "none";
         var l = n.createElement("source");
         l.setAttribute("src", e),
