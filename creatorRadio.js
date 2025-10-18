@@ -26,7 +26,7 @@
         this.audio = new Audio,
         this.audio.preload = proxiedUrl || "none";
         var l = n.createElement("source");
-        l.setAttribute("src", e),
+        l.setAttribute("src", proxiedUrl),
         a && (a = a.replace("\\", "/"),
         l.setAttribute("type", a)),
         this.audio.append(l),
