@@ -23,7 +23,9 @@
         this.$elem.attr("data-true-audio-player-song-id", this.id),
         this.$parentElem,
         this.audio = new Audio,
-        this.audio.preload = s || "none";
+
+        const proxiedUrl = "https://corsproxy.io/?" + encodeURIComponent(s);
+        this.audio.preload = proxiedUrl || "none";
         var l = n.createElement("source");
         l.setAttribute("src", e),
         a && (a = a.replace("\\", "/"),
