@@ -17,7 +17,7 @@
     };
     function a(t, e, i, r, a, s) {
         var u = this;
-        let proxiedUrl = "https://corsproxy.io/?" + encodeURIComponent(s);
+        let proxiedUrl = "https://corsproxy.io/?" + encodeURIComponent(e);
         this.id = o(),
         this.$elem = i,
         this.targetSetId = r,
