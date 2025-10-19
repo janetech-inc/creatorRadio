@@ -366,11 +366,7 @@
             const fadeTime = this.settings.crossfadeDuration || 2;
             // Mark that crossfade is in progress
             this._isCrossfading = true;
-        
-            // Create/reuse global AudioContext
-            if (!this._audioContext)
-                this._audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        
+    
             const context = this.getAudioContext();
         
             // Create or reuse source nodes
@@ -426,10 +422,6 @@
             const currentSong = this.getCurrentSong();
             const prevSong = this.songs[prevIndex];
             const fadeTime = this.settings.crossfadeDuration || 3;
-        
-            // Create or reuse shared AudioContext
-            if (!this._audioContext)
-                this._audioContext = new (window.AudioContext || window.webkitAudioContext)();
         
             const context = this.getAudioContext();
         
