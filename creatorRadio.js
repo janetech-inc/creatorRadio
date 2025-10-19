@@ -414,7 +414,7 @@
                 nextSong._fadeStarted = false;
                 this.setCurrentSong(nextIndex, false);
                 this.setPlayerState("playing", nextSong);
-            }, fadeTime * 1500);
+            }, fadeTime * 1100);
             
         },
         playPreviousSong: function() {
