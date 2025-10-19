@@ -11,6 +11,7 @@
  * Released on: December 30, 2024
  */
 !function(t, e, n, i) {
+    
     var r = {
         autoplay: !0,
         crossfadeDuration: 3 // seconds for fade in/out
@@ -38,6 +39,8 @@
         this._thumbnail = "",
         this._thumbnailBlob = "",
         this._thumbnailBlobUrl = "",
+        this._isCrossfading = false,
+
         this.getThumbnail = function() {
             return this._thumbnail
         }
@@ -54,6 +57,15 @@
             this._thumbnail = t
         }
         ,
+
+        this.getAudioContext = function() {
+         if (!this._audioContext) {
+            this._audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            return  this._audioContext
+        }
+        ,
+            
         this.audio.addEventListener("timeupdate", function(e) {
             if (t.isDragging)
                 return !1;
@@ -62,7 +74,7 @@
             t.updateSongDisplayTime(n, i)
 
               // Start crossfade when approaching end
-            const fadeBeforeEnd = t.settings.crossfadeDuration || 3;
+            const fadeBeforeEnd = t.settings.crossfadeDuration || 2;
             if (i && n >= i - fadeBeforeEnd && !this._fadeStarted) {
                 this._fadeStarted = true;
                 t.playNextSong();
@@ -351,13 +363,15 @@
             const nextIndex = this.songs[currentIndex + 1] ? currentIndex + 1 : 0;
             const currentSong = this.getCurrentSong();
             const nextSong = this.songs[nextIndex];
-            const fadeTime = this.settings.crossfadeDuration || 3;
+            const fadeTime = this.settings.crossfadeDuration || 2;
+            // Mark that crossfade is in progress
+            this._isCrossfading = true;
         
             // Create/reuse global AudioContext
             if (!this._audioContext)
                 this._audioContext = new (window.AudioContext || window.webkitAudioContext)();
         
-            const context = this._audioContext;
+            const context = this.getAudioContext();
         
             // Create or reuse source nodes
             if (!currentSong.sourceNode)
@@ -394,6 +408,11 @@
             setTimeout(() => {
                 currentSong.audio.pause();
                 currentSong.audio.currentTime = 0;
+                // Reset crossfade flag
+                this._isCrossfading = false;
+                // Reset fadeStarted flags to allow future fades
+                currentSong._fadeStarted = false;
+                nextSong._fadeStarted = false;
                 this.setCurrentSong(nextIndex);
                 this.setPlayerState("playing", nextSong);
             }, fadeTime * 1000);
@@ -412,7 +431,7 @@
             if (!this._audioContext)
                 this._audioContext = new (window.AudioContext || window.webkitAudioContext)();
         
-            const context = this._audioContext;
+            const context = this.getAudioContext();
         
             // Create or reuse MediaElementSource for both tracks
             if (!currentSong.sourceNode)
@@ -452,6 +471,9 @@
                 currentSong.audio.currentTime = 0;
                 this.setCurrentSong(prevIndex);
                 this.setPlayerState("playing", prevSong);
+                this._isCrossfading = false;
+                currentSong._fadeStarted = false;
+                prevSong._fadeStarted = false;
             }, fadeTime * 1000);
         },
         setPlayerState: function(t, e) {
