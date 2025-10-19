@@ -395,7 +395,7 @@
             nextSong.audio.play();
         
             // Fade between
-            currentSong.gainNode.gain.exponentialRampToValueAtTime(0, context.currentTime + fadeTime);
+            currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + fadeTime);
             nextSong.gainNode.gain.linearRampToValueAtTime(1, context.currentTime + fadeTime);
         
             // Stop old track after fade completes
@@ -454,7 +454,7 @@
         
             // Fade between them
             const now = context.currentTime;
-            currentSong.gainNode.gain.exponentialRampToValueAtTime(0, now + fadeTime);
+            currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, now + fadeTime);
             prevSong.gainNode.gain.linearRampToValueAtTime(1, now + fadeTime);
         
             // After fade, stop the current song and set state
