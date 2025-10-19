@@ -259,7 +259,7 @@
 
             if(l) {   
                 e.preload = "metadata";
-                e.audio.load();     
+                //e.audio.load();     
             }
    
             var n = this.songs[this._currentSongIndex];
@@ -392,7 +392,7 @@
             // Prepare and play next song
             nextSong.audio.currentTime = 0;
             nextSong.audio.volume = this.getVolume();
-            nextSong.audio.load();
+           // nextSong.audio.load();
             nextSong.audio.play();
         
             // Fade between
@@ -451,7 +451,6 @@
             prevSong.audio.currentTime = Math.max(0, prevSong.audio.duration - fadeTime);
             prevSong.audio.volume = this.getVolume();
             prevSong.audio.play();
-            prevSong.audio.load();
         
             // Fade between them
             const now = context.currentTime;
