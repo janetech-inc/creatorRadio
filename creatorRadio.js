@@ -23,6 +23,7 @@
         this.$elem.attr("data-true-audio-player-song-id", this.id),
         this.$parentElem,
         this.audio = new Audio,
+        this.audio.crossOrigin = "anonymous";
         this.audio.preload = e || "none";
         var l = n.createElement("source");
         l.setAttribute("src", e),
