@@ -424,39 +424,45 @@
         
              // Reuse a single AudioContext per crossfade
             const context = currentSong.getAudioContext(); 
+
+            try {
+             
+                // Create or reuse MediaElementSource for both tracks
+                if (!currentSong.sourceNode)
+                    currentSong.sourceNode = context.createMediaElementSource(currentSong.audio);
             
-            // Create or reuse MediaElementSource for both tracks
-            if (!currentSong.sourceNode)
-                currentSong.sourceNode = context.createMediaElementSource(currentSong.audio);
-        
-            if (!prevSong.sourceNode)
-                prevSong.sourceNode = context.createMediaElementSource(prevSong.audio);
-        
-            // Create or reuse gain nodes
-            if (!currentSong.gainNode) {
-                currentSong.gainNode = context.createGain();
-                currentSong.sourceNode.connect(currentSong.gainNode).connect(context.destination);
+                if (!prevSong.sourceNode)
+                    prevSong.sourceNode = context.createMediaElementSource(prevSong.audio);
+            
+                // Create or reuse gain nodes
+                if (!currentSong.gainNode) {
+                    currentSong.gainNode = context.createGain();
+                    currentSong.sourceNode.connect(currentSong.gainNode).connect(context.destination);
+                }
+            
+                if (!prevSong.gainNode) {
+                    prevSong.gainNode = context.createGain();
+                    prevSong.sourceNode.connect(prevSong.gainNode).connect(context.destination);
+                }
+            
+            } catch (err) {
+                console.warn("MediaElementSource already exists:", err);
             }
-        
-            if (!prevSong.gainNode) {
-                prevSong.gainNode = context.createGain();
-                prevSong.sourceNode.connect(prevSong.gainNode).connect(context.destination);
-            }
-        
+
             // Reset gains
             currentSong.gainNode.gain.setValueAtTime(1, context.currentTime);
             prevSong.gainNode.gain.setValueAtTime(0, context.currentTime);
-        
+            
             // Prepare and play previous song
             prevSong.audio.currentTime = Math.max(0, prevSong.audio.duration - fadeTime);
             prevSong.audio.volume = this.getVolume();
             prevSong.audio.play();
-        
+            
             // Fade between them
             const now = context.currentTime;
             currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, now + fadeTime);
             prevSong.gainNode.gain.linearRampToValueAtTime(1, now + fadeTime);
-        
+          
             // After fade, stop the current song and set state
             setTimeout(() => {
              //    currentSong.audio.pause();
