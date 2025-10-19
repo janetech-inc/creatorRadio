@@ -95,11 +95,12 @@
         this.audio.addEventListener("waiting", function() {
             t.targetSets[u.targetSetId] && t.targetSets[u.targetSetId].addClass("is-buffering")
         }),
-      /*  this.audio.addEventListener("ended", function() {
+        
+        this.audio.addEventListener("ended", function() {
             for (var e = truePlayerEventManager.getEventWatchers("audioEnded"), n = 0; n < e.length; n++)
                 e[n].callback(t);
-            1 == t.songs.length || t.isDragging || 0 == t.settings.autoplay ? t.stopCurrentSong() : t.playNextSong()
-        }), */
+            (1 == t.songs.length || t.isDragging || 0 == t.settings.autoplay) && !t._isCrossFading ? t.stopCurrentSong() : t.playNextSong() : 
+        }), 
         this.audio.addEventListener("loadedmetadata", function() {
             var e = parseInt(u.audio.duration / 60, 10)
               , n = parseInt(u.audio.duration % 60);
