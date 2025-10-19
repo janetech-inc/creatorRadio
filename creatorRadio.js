@@ -414,7 +414,7 @@
                 nextSong._fadeStarted = false;
                 this.setCurrentSong(nextIndex, false);
                 this.setPlayerState("playing", nextSong);
-            }, fadeTime * 1000);
+            }, fadeTime * 1500);
             
         },
         playPreviousSong: function() {
@@ -476,7 +476,7 @@
                 this._isCrossfading = false;
                 currentSong._fadeStarted = false;
                 prevSong._fadeStarted = false;
-            }, fadeTime * 1000);
+            }, fadeTime * 1500);
         },
         setPlayerState: function(t, e) {
             if (t == this._playerState)
