@@ -343,83 +343,106 @@
         playNextSong: function() {
            if (this.songs.length <= 1) return false;
 
-    const currentIndex = this.getCurrentSongIndex();
-    const nextIndex = this.songs[currentIndex + 1] ? currentIndex + 1 : 0;
-    const currentSong = this.getCurrentSong();
-    const nextSong = this.songs[nextIndex];
-    const fadeTime = this.settings.crossfadeDuration || 3;
+            const currentIndex = this.getCurrentSongIndex();
+            const nextIndex = this.songs[currentIndex + 1] ? currentIndex + 1 : 0;
+            const currentSong = this.getCurrentSong();
+            const nextSong = this.songs[nextIndex];
+            const fadeTime = this.settings.crossfadeDuration || 3;
+        
+            // Create/reuse global AudioContext
+            if (!this._audioContext)
+                this._audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+            const context = this._audioContext;
+        
+            // Create or reuse source nodes
+            if (!currentSong.sourceNode)
+                currentSong.sourceNode = context.createMediaElementSource(currentSong.audio);
+        
+            if (!nextSong.sourceNode)
+                nextSong.sourceNode = context.createMediaElementSource(nextSong.audio);
+        
+            // Create gain nodes for each track (store them so we can reuse)
+            if (!currentSong.gainNode) {
+                currentSong.gainNode = context.createGain();
+                currentSong.sourceNode.connect(currentSong.gainNode).connect(context.destination);
+            }
+        
+            if (!nextSong.gainNode) {
+                nextSong.gainNode = context.createGain();
+                nextSong.sourceNode.connect(nextSong.gainNode).connect(context.destination);
+            }
 
-    // Create/reuse global AudioContext
-    if (!this._audioContext)
-        this._audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-    const context = this._audioContext;
-
-    // Create or reuse source nodes
-    if (!currentSong.sourceNode)
-        currentSong.sourceNode = context.createMediaElementSource(currentSong.audio);
-
-    if (!nextSong.sourceNode)
-        nextSong.sourceNode = context.createMediaElementSource(nextSong.audio);
-
-    // Create gain nodes for each track (store them so we can reuse)
-    if (!currentSong.gainNode) {
-        currentSong.gainNode = context.createGain();
-        currentSong.sourceNode.connect(currentSong.gainNode).connect(context.destination);
-    }
-
-    if (!nextSong.gainNode) {
-        nextSong.gainNode = context.createGain();
-        nextSong.sourceNode.connect(nextSong.gainNode).connect(context.destination);
-    }
-
-    // Reset and start fade
-    currentSong.gainNode.gain.setValueAtTime(1, context.currentTime);
-    nextSong.gainNode.gain.setValueAtTime(0, context.currentTime);
-
-    // Prepare and play next song
-    nextSong.audio.currentTime = 0;
-    nextSong.audio.volume = this.getVolume();
-    nextSong.audio.play();
-
-    // Fade between
-    currentSong.gainNode.gain.linearRampToValueAtTime(0, context.currentTime + fadeTime);
-    nextSong.gainNode.gain.linearRampToValueAtTime(1, context.currentTime + fadeTime);
-
-    // Stop old track after fade completes
-    setTimeout(() => {
-        currentSong.audio.pause();
-        currentSong.audio.currentTime = 0;
-        this.setCurrentSong(nextIndex);
-        this.setPlayerState("playing", nextSong);
-    }, fadeTime * 1000);
+            // Reset and start fade
+            currentSong.gainNode.gain.setValueAtTime(1, context.currentTime);
+            nextSong.gainNode.gain.setValueAtTime(0, context.currentTime);
+        
+            // Prepare and play next song
+            nextSong.audio.currentTime = 0;
+            nextSong.audio.volume = this.getVolume();
+            nextSong.audio.play();
+        
+            // Fade between
+            currentSong.gainNode.gain.linearRampToValueAtTime(0, context.currentTime + fadeTime);
+            nextSong.gainNode.gain.linearRampToValueAtTime(1, context.currentTime + fadeTime);
+        
+            // Stop old track after fade completes
+            setTimeout(() => {
+                currentSong.audio.pause();
+                currentSong.audio.currentTime = 0;
+                this.setCurrentSong(nextIndex);
+                this.setPlayerState("playing", nextSong);
+            }, fadeTime * 1000);
             
         },
         playPreviousSong: function() {
-            const fadeTime = this.settings.crossfadeDuration || 3;
+           if (this.songs.length <= 1) return false;
+
             const currentIndex = this.getCurrentSongIndex();
-            const prevIndex = this.songs[currentIndex - 1] ? currentIndex - 1 : this.songs.length - 1;
-        
+            const prevIndex = currentIndex > 0 ? currentIndex - 1 : this.songs.length - 1;
             const currentSong = this.getCurrentSong();
             const prevSong = this.songs[prevIndex];
-            const context = new (window.AudioContext || window.webkitAudioContext)();
+            const fadeTime = this.settings.crossfadeDuration || 3;
         
-            const gainOut = context.createGain();
-            const gainIn = context.createGain();
-            const sourceOut = context.createMediaElementSource(currentSong.audio);
-            const sourceIn = context.createMediaElementSource(prevSong.audio);
-            sourceOut.connect(gainOut).connect(context.destination);
-            sourceIn.connect(gainIn).connect(context.destination);
-            gainOut.gain.setValueAtTime(1, context.currentTime);
-            gainIn.gain.setValueAtTime(0, context.currentTime);
+            // Create or reuse shared AudioContext
+            if (!this._audioContext)
+                this._audioContext = new (window.AudioContext || window.webkitAudioContext)();
         
-            prevSong.audio.currentTime = 0;
+            const context = this._audioContext;
+        
+            // Create or reuse MediaElementSource for both tracks
+            if (!currentSong.sourceNode)
+                currentSong.sourceNode = context.createMediaElementSource(currentSong.audio);
+        
+            if (!prevSong.sourceNode)
+                prevSong.sourceNode = context.createMediaElementSource(prevSong.audio);
+        
+            // Create or reuse gain nodes
+            if (!currentSong.gainNode) {
+                currentSong.gainNode = context.createGain();
+                currentSong.sourceNode.connect(currentSong.gainNode).connect(context.destination);
+            }
+        
+            if (!prevSong.gainNode) {
+                prevSong.gainNode = context.createGain();
+                prevSong.sourceNode.connect(prevSong.gainNode).connect(context.destination);
+            }
+        
+            // Reset gains
+            currentSong.gainNode.gain.setValueAtTime(1, context.currentTime);
+            prevSong.gainNode.gain.setValueAtTime(0, context.currentTime);
+        
+            // Prepare and play previous song
+            prevSong.audio.currentTime = Math.max(0, prevSong.audio.duration - fadeTime);
             prevSong.audio.volume = this.getVolume();
             prevSong.audio.play();
         
-            gainOut.gain.linearRampToValueAtTime(0, context.currentTime + fadeTime);
-            gainIn.gain.linearRampToValueAtTime(1, context.currentTime + fadeTime);
+            // Fade between them
+            const now = context.currentTime;
+            currentSong.gainNode.gain.linearRampToValueAtTime(0, now + fadeTime);
+            prevSong.gainNode.gain.linearRampToValueAtTime(1, now + fadeTime);
         
+            // After fade, stop the current song and set state
             setTimeout(() => {
                 currentSong.audio.pause();
                 currentSong.audio.currentTime = 0;
