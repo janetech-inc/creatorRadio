@@ -248,8 +248,8 @@
         
             // Only load if song has never been loaded
             if (!e._metadataLoaded) {
-                e.preload = "metadata";
-                e.audio.load();
+             //   e.preload = "metadata";
+               // e.audio.load();
                 e._metadataLoaded = true;
             }                            
    
