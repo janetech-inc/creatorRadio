@@ -368,7 +368,7 @@
             // Reuse a single AudioContext per crossfade
             const context = currentSong.getAudioContext();
 
-            if (!nextSong.audio.paused) {
+            if (!nextSong.audio.paused || "playing" != this.getPlayerState()) {
                 return;
             }
                 
