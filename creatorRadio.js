@@ -362,13 +362,13 @@
             const currentSong = this.getCurrentSong();
             const nextSong = this.songs[nextIndex];
             const fadeTime = this.settings.crossfadeDuration || 2;
-            // Mark that crossfade is in progress
+            // Mark that crossfade is in progres
             this._isCrossfading = true;
     
             // Reuse a single AudioContext per crossfade
             const context = currentSong.getAudioContext();
 
-            if (!nextSong.audio.paused || "playing" != this.getPlayerState()) {
+            if (!nextSong.audio.paused && "paused" != this.getPlayerState()) {
                 return;
             }
                 
