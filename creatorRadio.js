@@ -454,7 +454,7 @@
         
             // Fade between them
             const now = context.currentTime;
-            currentSong.gainNode.gain.linearRampToValueAtTime(0, now + fadeTime);
+            currentSong.gainNode.gain.exponentialRampToValueAtTime(0, now + fadeTime);
             prevSong.gainNode.gain.linearRampToValueAtTime(1, now + fadeTime);
         
             // After fade, stop the current song and set state
