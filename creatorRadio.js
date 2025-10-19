@@ -256,12 +256,8 @@
             var e = this.songs[t];
             if (!e) return console.error("Song with index " + t + " not found."), !1;
         
-            // Only load if song has never been loaded
-            if (!e._metadataLoaded) {
-                 e.preload = "metadata";
-                 e.audio.load();
-                e._metadataLoaded = true;
-            }                            
+            e.preload = "metadata";
+            e.audio.load();                        
    
             var n = this.songs[this._currentSongIndex];
             n && n.$parentElem && n.targetSetId != e.targetSetId && (n.$parentElem.removeClass("is-current"),
