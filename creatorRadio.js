@@ -389,10 +389,8 @@
             // Prepare and play next song
             nextSong.audio.currentTime = 0;
             nextSong.audio.volume = this.getVolume();
-
-            if (nextSong.audio.paused) {
-                nextSong.audio.play();
-            }
+            nextSong.audio.load();
+            nextSong.audio.play();
         
             // Fade between
             currentSong.gainNode.gain.linearRampToValueAtTime(0, context.currentTime + fadeTime);
@@ -450,6 +448,7 @@
             prevSong.audio.currentTime = Math.max(0, prevSong.audio.duration - fadeTime);
             prevSong.audio.volume = this.getVolume();
             prevSong.audio.play();
+            prevSong.audio.load();
         
             // Fade between them
             const now = context.currentTime;
