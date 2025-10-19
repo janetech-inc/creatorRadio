@@ -67,8 +67,8 @@
         this.audio.addEventListener("timeupdate", function(e) {
             if (t.isDragging)
                 return !1;
-            var n = e.srcElement.currentTime
-              , i = e.srcElement.duration;
+            var n = this.getCurrentSong().audio.currentTime
+              , i = this.getCurrentSong().audio.currentTime.srcElement.duration;
             t.updateSongDisplayTime(n, i)
 
               // Start crossfade when approaching end
