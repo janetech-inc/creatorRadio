@@ -58,10 +58,10 @@
         }
         ,
         this.getAudioContext = function() {
-         if (!t._audioContext) {
-            t._audioContext = new (window.AudioContext || window.webkitAudioContext)();
+         if (!this._audioContext) {
+            this._audioContext = new (window.AudioContext || window.webkitAudioContext)();
             }
-            return  t._audioContext
+            return this._audioContext
         }
         ,   
         this.audio.addEventListener("timeupdate", function(e) {
@@ -256,8 +256,8 @@
             var e = this.songs[t];
             if (!e) return console.error("Song with index " + t + " not found."), !1;
         
-           // e.preload = "metadata";
-            //e.audio.load();                        
+            e.preload = "metadata";
+            e.audio.load();                        
    
             var n = this.songs[this._currentSongIndex];
             n && n.$parentElem && n.targetSetId != e.targetSetId && (n.$parentElem.removeClass("is-current"),
