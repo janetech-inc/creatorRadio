@@ -367,6 +367,10 @@
     
             // Reuse a single AudioContext per crossfade
             const context = currentSong.getAudioContext();
+
+            if (!nextSong.audio.paused) {
+                return;
+            }
                 
             // Create or reuse source nodes
             if (!currentSong.sourceNode)
