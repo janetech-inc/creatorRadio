@@ -68,7 +68,7 @@
             if (t.isDragging)
                 return !1;
             var n = t.getCurrentSong().audio.currentTime
-              , i = t.getCurrentSong().audio.currentTime.srcElement.duration;
+              , i = t.getCurrentSong().audio.duration;
             t.updateSongDisplayTime(n, i)
 
               // Start crossfade when approaching end
