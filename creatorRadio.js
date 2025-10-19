@@ -258,8 +258,8 @@
         
             // Only load if song has never been loaded
             if (!e._metadataLoaded) {
-             //   e.preload = "metadata";
-               // e.audio.load();
+                 e.preload = "metadata";
+                 e.audio.load();
                 e._metadataLoaded = true;
             }                            
    
@@ -401,8 +401,8 @@
         
             // Stop old track after fade completes
             setTimeout(() => {
-                //currentSong.audio.pause();
-              //  currentSong.audio.currentTime = 0;
+                currentSong.audio.pause();
+                currentSong.audio.currentTime = 0;
                 // Reset crossfade flag
                 this._isCrossfading = false;
                 // Reset fadeStarted flags to allow future fades
@@ -460,7 +460,7 @@
             // After fade, stop the current song and set state
             setTimeout(() => {
                 currentSong.audio.pause();
-              //  currentSong.audio.currentTime = 0;
+                currentSong.audio.currentTime = 0;
                 this.setCurrentSong(prevIndex);
                 this.setPlayerState("playing", prevSong);
                 this._isCrossfading = false;
