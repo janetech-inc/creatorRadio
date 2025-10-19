@@ -393,7 +393,7 @@
             // Prepare and play next song
             nextSong.audio.currentTime = 0;
             nextSong.audio.volume = this.getVolume();
-           // nextSong.audio.load();
+            nextSong.audio.load();
             nextSong.audio.play();
         
             // Fade between
