@@ -410,12 +410,13 @@
               //  currentSong.audio.currentTime = 0;
                 // Reset crossfade flag
                 this._isCrossfading = false;
+                this._fadeStarted = false;
                 // Reset fadeStarted flags to allow future fades
                 currentSong._fadeStarted = false;
                 nextSong._fadeStarted = false;
                 this.setCurrentSong(nextIndex, false);
                 this.setPlayerState("playing", nextSong);
-            }, fadeTime * 1100);
+            }, fadeTime * 1000);
             
         },
         playPreviousSong: function() {
@@ -477,6 +478,7 @@
                 this._isCrossfading = false;
                 currentSong._fadeStarted = false;
                 prevSong._fadeStarted = false;
+                this._fadeStarted = false;
             }, fadeTime * 1500);
         },
         setPlayerState: function(t, e) {
