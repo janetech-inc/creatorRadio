@@ -73,7 +73,7 @@
 
               // Start crossfade when approaching end
             const fadeBeforeEnd = t.settings.crossfadeDuration || 2;
-            if (i && n >= i - fadeBeforeEnd) {
+            if (i && n >= i - fadeBeforeEnd && !this._fadeStarted) {
                 this._fadeStarted = true;
                 t.playNextSong();
             }
