@@ -14,7 +14,7 @@
     
     var r = {
         autoplay: !0,
-        crossfadeDuration: 3 // seconds for fade in/out
+        crossfadeDuration: 2 // seconds for fade in/out
     };
     function a(t, e, i, r, a, s) {
         var u = this;
@@ -419,7 +419,7 @@
             const prevIndex = currentIndex > 0 ? currentIndex - 1 : this.songs.length - 1;
             const currentSong = this.getCurrentSong();
             const prevSong = this.songs[prevIndex];
-            const fadeTime = this.settings.crossfadeDuration || 3;
+            const fadeTime = this.settings.crossfadeDuration || 2;
         
              // Reuse a single AudioContext per crossfade
             const context = currentSong.getAudioContext(); 
