@@ -249,15 +249,17 @@
             "playing" == this.getPlayerState() ? this.stopCurrentSong() : this.playCurrentSong()
         },
         getCurrentSong: function() {
-            return -1 === this.getCurrentSongIndex() && this.setCurrentSong(0),
+            return -1 === this.getCurrentSongIndex() && this.setCurrentSong(0, false),
             this.songs[this.getCurrentSongIndex()]
         },
-        setCurrentSong: function(t) {
+        setCurrentSong: function(t, l) {
             var e = this.songs[t];
             if (!e) return console.error("Song with index " + t + " not found."), !1;
-        
-            e.preload = "metadata";
-            e.audio.load();                        
+
+            if(l) {   
+                e.preload = "metadata";
+                e.audio.load();     
+            }
    
             var n = this.songs[this._currentSongIndex];
             n && n.$parentElem && n.targetSetId != e.targetSetId && (n.$parentElem.removeClass("is-current"),
@@ -405,7 +407,7 @@
                 // Reset fadeStarted flags to allow future fades
                 currentSong._fadeStarted = false;
                 nextSong._fadeStarted = false;
-                this.setCurrentSong(nextIndex);
+                this.setCurrentSong(nextIndex, false);
                 this.setPlayerState("playing", nextSong);
             }, fadeTime * 1000);
             
@@ -459,7 +461,7 @@
             setTimeout(() => {
              //    currentSong.audio.pause();
                //    currentSong.audio.currentTime = 0;
-                this.setCurrentSong(prevIndex);
+                this.setCurrentSong(prevIndex, false);
                  this.setPlayerState("playing", prevSong);
                 this._isCrossfading = false;
                 currentSong._fadeStarted = false;
@@ -556,7 +558,7 @@
                 e.filter(function(t) {
                     return t.song.id == i
                 }).length > 0 ? n.togglePauseCurrentSong() : (n.stopCurrentSong(),
-                n.setCurrentSong(e[0].globalIndex),
+                n.setCurrentSong(e[0].globalIndex, true),
                 n.playCurrentSong())
             }),
             t(e).find('[tmplayer-element="audio"]').hide().each(function(t, i) {
@@ -646,7 +648,7 @@
                 },
                 play: function(t) {
                     this.stopCurrentSong(),
-                    t && this.setCurrentSong(t),
+                    t && this.setCurrentSong(t, true),
                     this.playCurrentSong()
                 },
                 togglePause: function() {
