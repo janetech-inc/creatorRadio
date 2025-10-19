@@ -341,49 +341,59 @@
             this.setVolume(i)
         },
         playNextSong: function() {
-            if (this.songs.length <= 1) return !1;
+           if (this.songs.length <= 1) return false;
 
-            const currentIndex = this.getCurrentSongIndex();
-            const nextIndex = this.songs[currentIndex + 1] ? currentIndex + 1 : 0;
-        
-            const currentSong = this.getCurrentSong();
-            const nextSong = this.songs[nextIndex];
-        
-            const fadeTime = this.settings.crossfadeDuration || 3;
-            const context = new (window.AudioContext || window.webkitAudioContext)();
-        
-            // Create gain nodes
-            const gainOut = context.createGain();
-            const gainIn = context.createGain();
-        
-            // Create media element sources
-            const sourceOut = context.createMediaElementSource(currentSong.audio);
-            const sourceIn = context.createMediaElementSource(nextSong.audio);
-        
-            // Connect
-            sourceOut.connect(gainOut).connect(context.destination);
-            sourceIn.connect(gainIn).connect(context.destination);
-        
-            // Set initial volumes
-            gainOut.gain.setValueAtTime(1, context.currentTime);
-            gainIn.gain.setValueAtTime(0, context.currentTime);
-        
-            // Prepare next track
-            nextSong.audio.currentTime = 0;
-            nextSong.audio.volume = this.getVolume();
-            nextSong.audio.play();
-        
-            // Fade out old / fade in new
-            gainOut.gain.linearRampToValueAtTime(0, context.currentTime + fadeTime);
-            gainIn.gain.linearRampToValueAtTime(1, context.currentTime + fadeTime);
-        
-            // Stop old track after fade
-            setTimeout(() => {
-                currentSong.audio.pause();
-                currentSong.audio.currentTime = 0;
-                this.setCurrentSong(nextIndex);
-                this.setPlayerState("playing", nextSong);
-            }, fadeTime * 1000);
+    const currentIndex = this.getCurrentSongIndex();
+    const nextIndex = this.songs[currentIndex + 1] ? currentIndex + 1 : 0;
+    const currentSong = this.getCurrentSong();
+    const nextSong = this.songs[nextIndex];
+    const fadeTime = this.settings.crossfadeDuration || 3;
+
+    // Create/reuse global AudioContext
+    if (!this._audioContext)
+        this._audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    const context = this._audioContext;
+
+    // Create or reuse source nodes
+    if (!currentSong.sourceNode)
+        currentSong.sourceNode = context.createMediaElementSource(currentSong.audio);
+
+    if (!nextSong.sourceNode)
+        nextSong.sourceNode = context.createMediaElementSource(nextSong.audio);
+
+    // Create gain nodes for each track (store them so we can reuse)
+    if (!currentSong.gainNode) {
+        currentSong.gainNode = context.createGain();
+        currentSong.sourceNode.connect(currentSong.gainNode).connect(context.destination);
+    }
+
+    if (!nextSong.gainNode) {
+        nextSong.gainNode = context.createGain();
+        nextSong.sourceNode.connect(nextSong.gainNode).connect(context.destination);
+    }
+
+    // Reset and start fade
+    currentSong.gainNode.gain.setValueAtTime(1, context.currentTime);
+    nextSong.gainNode.gain.setValueAtTime(0, context.currentTime);
+
+    // Prepare and play next song
+    nextSong.audio.currentTime = 0;
+    nextSong.audio.volume = this.getVolume();
+    nextSong.audio.play();
+
+    // Fade between
+    currentSong.gainNode.gain.linearRampToValueAtTime(0, context.currentTime + fadeTime);
+    nextSong.gainNode.gain.linearRampToValueAtTime(1, context.currentTime + fadeTime);
+
+    // Stop old track after fade completes
+    setTimeout(() => {
+        currentSong.audio.pause();
+        currentSong.audio.currentTime = 0;
+        this.setCurrentSong(nextIndex);
+        this.setPlayerState("playing", nextSong);
+    }, fadeTime * 1000);
+            
         },
         playPreviousSong: function() {
             const fadeTime = this.settings.crossfadeDuration || 3;
