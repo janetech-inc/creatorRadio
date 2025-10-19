@@ -256,7 +256,7 @@
             var e = this.songs[t];
             if (!e) return console.error("Song with index " + t + " not found."), !1;
         
-            e.preload = "metadata";
+           // e.preload = "metadata";
             //e.audio.load();                        
    
             var n = this.songs[this._currentSongIndex];
