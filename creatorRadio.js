@@ -366,7 +366,7 @@
             this._isCrossfading = true;
     
             // Reuse a single AudioContext per crossfade
-            const context = this.getAudioContext();
+            const context = currentSong.getAudioContext();
                 
             // Create or reuse source nodes
             if (!currentSong.sourceNode)
@@ -422,8 +422,8 @@
             const prevSong = this.songs[prevIndex];
             const fadeTime = this.settings.crossfadeDuration || 3;
         
-            // Reuse a single AudioContext per crossfade
-            const context = new (window.AudioContext || window.webkitAudioContext)();   
+             // Reuse a single AudioContext per crossfade
+            const context = currentSong.getAudioContext(); 
             
             // Create or reuse MediaElementSource for both tracks
             if (!currentSong.sourceNode)
