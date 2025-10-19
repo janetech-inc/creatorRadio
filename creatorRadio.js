@@ -389,7 +389,10 @@
             // Prepare and play next song
             nextSong.audio.currentTime = 0;
             nextSong.audio.volume = this.getVolume();
-            nextSong.audio.play();
+
+            if (nextSong.audio.paused) {
+                nextSong.audio.play();
+            }
         
             // Fade between
             currentSong.gainNode.gain.linearRampToValueAtTime(0, context.currentTime + fadeTime);
