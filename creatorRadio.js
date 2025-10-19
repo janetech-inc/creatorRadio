@@ -405,7 +405,7 @@
                 currentSong._fadeStarted = false;
                 nextSong._fadeStarted = false;
                 this.setCurrentSong(nextIndex);
-                this.setPlayerState("playing", nextSong);
+                //this.setPlayerState("playing", nextSong);
             }, fadeTime * 1000);
             
         },
@@ -458,7 +458,7 @@
              //   currentSong.audio.pause();
                // currentSong.audio.currentTime = 0;
                 this.setCurrentSong(prevIndex);
-                this.setPlayerState("playing", prevSong);
+             //   this.setPlayerState("playing", prevSong);
                 this._isCrossfading = false;
                 currentSong._fadeStarted = false;
                 prevSong._fadeStarted = false;
