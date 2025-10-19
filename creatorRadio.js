@@ -57,15 +57,13 @@
             this._thumbnail = t
         }
         ,
-
         this.getAudioContext = function() {
-         if (!this._audioContext) {
-            this._audioContext = new (window.AudioContext || window.webkitAudioContext)();
+         if (!t._audioContext) {
+            t._audioContext = new (window.AudioContext || window.webkitAudioContext)();
             }
-            return  this._audioContext
+            return  t._audioContext
         }
-        ,
-            
+        ,   
         this.audio.addEventListener("timeupdate", function(e) {
             if (t.isDragging)
                 return !1;
@@ -368,7 +366,7 @@
             this._isCrossfading = true;
     
             // Reuse a single AudioContext per crossfade
-            const context = new (window.AudioContext || window.webkitAudioContext)();
+            const context = this.getAudioContext();
                 
             // Create or reuse source nodes
             if (!currentSong.sourceNode)
