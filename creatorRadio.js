@@ -60,6 +60,13 @@
             var n = e.srcElement.currentTime
               , i = e.srcElement.duration;
             t.updateSongDisplayTime(n, i)
+
+              // Start crossfade when approaching end
+            const fadeBeforeEnd = t.settings.crossfadeDuration || 3;
+            if (i && n >= i - fadeBeforeEnd && !this._fadeStarted) {
+                this._fadeStarted = true;
+                t.playNextSong();
+            }
         }),
         this.audio.addEventListener("volumechange", function(e) {
             var n = 100 * e.srcElement.volume;
