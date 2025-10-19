@@ -367,8 +367,9 @@
             // Mark that crossfade is in progress
             this._isCrossfading = true;
     
-            const context = this.getAudioContext();
-        
+            // Reuse a single AudioContext per crossfade
+            const context = new (window.AudioContext || window.webkitAudioContext)();
+                
             // Create or reuse source nodes
             if (!currentSong.sourceNode)
                 currentSong.sourceNode = context.createMediaElementSource(currentSong.audio);
@@ -409,7 +410,7 @@
                 // Reset fadeStarted flags to allow future fades
                 currentSong._fadeStarted = false;
                 nextSong._fadeStarted = false;
-                this.setCurrentSong(nextIndex);
+              //  this.setCurrentSong(nextIndex);
                 this.setPlayerState("playing", nextSong);
             }, fadeTime * 1000);
             
@@ -423,8 +424,9 @@
             const prevSong = this.songs[prevIndex];
             const fadeTime = this.settings.crossfadeDuration || 3;
         
-            const context = this.getAudioContext();
-        
+            // Reuse a single AudioContext per crossfade
+            const context = new (window.AudioContext || window.webkitAudioContext)();   
+            
             // Create or reuse MediaElementSource for both tracks
             if (!currentSong.sourceNode)
                 currentSong.sourceNode = context.createMediaElementSource(currentSong.audio);
@@ -461,7 +463,7 @@
             setTimeout(() => {
                 currentSong.audio.pause();
                 currentSong.audio.currentTime = 0;
-                this.setCurrentSong(prevIndex);
+               // this.setCurrentSong(prevIndex);
                 this.setPlayerState("playing", prevSong);
                 this._isCrossfading = false;
                 currentSong._fadeStarted = false;
