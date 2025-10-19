@@ -73,8 +73,8 @@
 
               // Start crossfade when approaching end
             const fadeBeforeEnd = t.settings.crossfadeDuration || 2;
-            if (i && n >= i - fadeBeforeEnd && !this._fadeStarted) {
-                this._fadeStarted = true;
+            if (i && n >= i - fadeBeforeEnd && !t._fadeStarted) {
+                t._fadeStarted = true;
                 t.playNextSong();
             }
         }),
@@ -411,9 +411,6 @@
                 // Reset crossfade flag
                 this._isCrossfading = false;
                 this._fadeStarted = false;
-                // Reset fadeStarted flags to allow future fades
-                currentSong._fadeStarted = false;
-                nextSong._fadeStarted = false;
                 this.setCurrentSong(nextIndex, false);
                 this.setPlayerState("playing", nextSong);
             }, fadeTime * 1000);
@@ -476,8 +473,6 @@
                 this.setCurrentSong(prevIndex, false);
                  this.setPlayerState("playing", prevSong);
                 this._isCrossfading = false;
-                currentSong._fadeStarted = false;
-                prevSong._fadeStarted = false;
                 this._fadeStarted = false;
             }, fadeTime * 1500);
         },
