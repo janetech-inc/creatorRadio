@@ -59,10 +59,10 @@
         }
         ,
         this.getAudioContext = function() {
-         if (!t._audioContext) {
-            t._audioContext = new (window.AudioContext || window.webkitAudioContext)();
+         if (!this._audioContext) {
+            this._audioContext = new (window.AudioContext || window.webkitAudioContext)();
             }
-            return t._audioContext
+            return this._audioContext
         }
         ,   
         this.audio.addEventListener("timeupdate", function(e) {
