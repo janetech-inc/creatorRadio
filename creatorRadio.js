@@ -610,10 +610,18 @@
             });
             t(s).on("click", function(t) {
                 var e = n.songs.map(function(t, e) {
-                    if (isIOS) {
-                     t.audio.play()
-                        .then(() => song.audio.pause())
-                        .catch(() => {});
+                    if (isIOS && t._iosUnlocked) {
+                        if (t.audio.paused) {
+                            const p = t.audio.play();
+                            if (p && p.then) {
+                                p.then(() => {
+                                    // Immediately pause, reset to 0
+                                    t.audio.pause();
+                                    t.audio.currentTime = 0;
+                                }).catch(() => {});
+                            }
+                            t._iosUnlocked = true
+                        } 
                     }
                     return songMap = {
                         globalIndex: e,
