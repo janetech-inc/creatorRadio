@@ -486,7 +486,7 @@
          //   currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + fadeTime);
            // nextSong.gainNode.gain.linearRampToValueAtTime(1, context.currentTime + fadeTime);
             this.fadeOut(currentSong.type, currentSong, context.currentTime + fadeTime);
-            this.fadeIn(nextSong.type, currentSong, context.currentTime + fadeTime);
+            this.fadeIn(nextSong.type, nextSong, context.currentTime + fadeTime);
         
             // Stop old track after fade completes
             setTimeout(() => {
@@ -557,7 +557,7 @@
            // prevSong.gainNode.gain.linearRampToValueAtTime(1, now + fadeTime);
 
             this.fadeOut(currentSong.type, currentSong, now + fadeTime);
-            this.fadeIn(prevSong.type, currentSong, now + fadeTime);
+            this.fadeIn(prevSong.type, prevSong, now + fadeTime);
           
             // After fade, stop the current song and set state
             setTimeout(() => {
