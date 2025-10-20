@@ -36,6 +36,7 @@
         this.artist = "",
         this.album = "",
         this.genre = "",
+        this.type = "",
         this.durationString = "0:00",
         this._thumbnail = "",
         this._thumbnailBlob = "",
@@ -157,6 +158,7 @@
             this.$albumName = this.$elem.find('[tmplayer-element="album"]').attr("tmplayer-interaction", "monitor-state"),
             this.$artistName = this.$elem.find('[tmplayer-element="artist"]').attr("tmplayer-interaction", "monitor-state"),
             this.$genre = this.$elem.find('[tmplayer-element="genre"]').attr("tmplayer-interaction", "monitor-state"),
+            this.$type = this.$elem.find('[tmplayer-element="type"]').attr("tmplayer-interaction", "monitor-state"),
             this.playButton = this.$elem.find('[tmplayer-button="play"]'),
             this.pauseButton = this.$elem.find('[tmplayer-button="pause"]'),
             this.nextButton = this.$elem.find('[tmplayer-button="next"]'),
@@ -410,6 +412,25 @@
               , i = (e - this.$volumeBarWrapper.offset().left) / n;
             this.setVolume(i)
         },
+
+        fadeIn: function(type, song, fadeTime) {
+            switch (type) {
+                case 'promo': return song.gainNode.gain.linearRampToValueAtTime(1, fadeTime);
+                case 'liner': return song.gainNode.gain.exponentialRampToValueAtTime(0.01, fadeTime);
+                case 'show': return song.gainNode.gain.exponentialRampToValueAtTime(0.01, fadeTime);  
+                case 'music': return song.gainNode.gain.linearRampToValueAtTime(1, fadeTime);
+                default: return song.gainNode.gain.linearRampToValueAtTime(1, fadeTime);
+              }
+        },  
+        fadeOut: function(type, song, fadeTime) {
+            switch (type) {
+                case 'promo': return song.gainNode.gain.linearRampToValueAtTime(1, fadeTime);
+                case 'liner': return  song.gainNode.gain.linearRampToValueAtTime(1, fadeTime);
+                case 'show': return;  
+                case 'music': return song.gainNode.gain.exponentialRampToValueAtTime(0.01, fadeTime);
+                default: return song.gainNode.gain.linearRampToValueAtTime(1, fadeTime);
+              }
+        }, 
         playNextSong: function() {
            if (this.songs.length <= 1) return false;
             const currentSong = this.getCurrentSong();
@@ -462,8 +483,10 @@
             nextSong.audio.play().catch(err => console.warn("Playback blocked", err));
         
             // Fade between
-            currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + fadeTime);
-            nextSong.gainNode.gain.linearRampToValueAtTime(1, context.currentTime + fadeTime);
+         //   currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + fadeTime);
+           // nextSong.gainNode.gain.linearRampToValueAtTime(1, context.currentTime + fadeTime);
+            this.fadeOut(currentSong.type, currentSong, context.currentTime + fadeTime);
+            this.fadeIn(nextSong.type, currentSong, context.currentTime + fadeTime);
         
             // Stop old track after fade completes
             setTimeout(() => {
@@ -530,8 +553,11 @@
             
             // Fade between them
             const now = context.currentTime;
-            currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, now + fadeTime);
-            prevSong.gainNode.gain.linearRampToValueAtTime(1, now + fadeTime);
+          //  currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, now + fadeTime);
+           // prevSong.gainNode.gain.linearRampToValueAtTime(1, now + fadeTime);
+
+            this.fadeOut(currentSong.type, currentSong, now + fadeTime);
+            this.fadeIn(prevSong.type, currentSong, now + fadeTime);
           
             // After fade, stop the current song and set state
             setTimeout(() => {
@@ -662,6 +688,7 @@
             h.artist = r.children('[tmplayer-meta="artist"]').text(),
             h.genre = r.children('[tmplayer-meta="genre"]').text(),
             h.album = r.children('[tmplayer-meta="album"]').text(),
+            h.type = r.children('[tmplayer-meta="type"]').text(),
             r.children('[tmplayer-meta="thumbnail"]').text() ? h.setThumbnail(r.children('[tmplayer-meta="thumbnail"]').text()) : r.children('[tmplayer-meta="thumbnail"]').attr("src") && h.setThumbnail(r.children('[tmplayer-meta="thumbnail"]').attr("src")),
             this.songs.push(h)
         },
