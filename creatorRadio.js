@@ -251,10 +251,6 @@
             this.getCurrentSong().audio.volume = this.getVolume(),
             e.truePlayerManager.activePlayer = this,
             this.getCurrentSong().audio.play()
-            //preload next song
-          //  this.getNextSong().audio.play(),
-           // this.getNextSong().audio.pause(),
-            //this.getNextSong().audio.currentTime = 0
         },
         stopCurrentSong: function() {
             this.pauseCurrentSong(),
@@ -614,6 +610,11 @@
             });
             t(s).on("click", function(t) {
                 var e = n.songs.map(function(t, e) {
+                    if (isIOS) {
+                     t.audio.play()
+                        .then(() => song.audio.pause())
+                        .catch(() => {});
+                    }
                     return songMap = {
                         globalIndex: e,
                         song: t
