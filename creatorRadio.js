@@ -250,7 +250,11 @@
             this.playButton.hide(),
             this.getCurrentSong().audio.volume = this.getVolume(),
             e.truePlayerManager.activePlayer = this,
-            this.getCurrentSong().audio.play()
+            this.getCurrentSong().audio.play(),
+            //preload next song
+            this.getNextSong().audio.play(),
+            this.getNextSong().audio.pause(),
+            this.getNextSong().audio.currentTime = 0
         },
         stopCurrentSong: function() {
             this.pauseCurrentSong(),
@@ -272,6 +276,11 @@
         getCurrentSong: function() {
             return -1 === this.getCurrentSongIndex() && this.setCurrentSong(0, false),
             this.songs[this.getCurrentSongIndex()]
+        },
+        getNextSong: function() {
+            const currentIndex = this.getCurrentSongIndex();
+            const nextIndex = this.songs[currentIndex + 1] ? currentIndex + 1 : 0;
+            return this.songs[nextIndex];
         },
         setCurrentSong: function(t, l) {
             var e = this.songs[t];
@@ -375,11 +384,8 @@
         },
         playNextSong: function() {
            if (this.songs.length <= 1) return false;
-
-            const currentIndex = this.getCurrentSongIndex();
-            const nextIndex = this.songs[currentIndex + 1] ? currentIndex + 1 : 0;
             const currentSong = this.getCurrentSong();
-            const nextSong = this.songs[nextIndex];
+            const nextSong = this.getNextSong()
             const fadeTime = this.settings.crossfadeDuration || 2;
             // Mark that crossfade is in progres
             this._isCrossfading = true;
