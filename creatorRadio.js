@@ -467,8 +467,6 @@
         
             // Stop old track after fade completes
             setTimeout(() => {
-                //currentSong.audio.pause();
-              //  currentSong.audio.currentTime = 0;
                 // Reset crossfade flag
                 this._isCrossfading = false;
                 this._fadeStarted = false;
@@ -528,7 +526,7 @@
             // Prepare and play previous song
             prevSong.audio.currentTime = Math.max(0, prevSong.audio.duration - fadeTime);
             prevSong.audio.volume = this.getVolume();
-            prevSong.audio.play();
+            prevSong.audio.play().catch(err => console.warn("Playback blocked", err));
             
             // Fade between them
             const now = context.currentTime;
@@ -537,10 +535,8 @@
           
             // After fade, stop the current song and set state
             setTimeout(() => {
-             //    currentSong.audio.pause();
-               //    currentSong.audio.currentTime = 0;
                 this.setCurrentSong(prevIndex, false);
-                 this.setPlayerState("playing", prevSong);
+                this.setPlayerState("playing", prevSong);
                 this._isCrossfading = false;
                 this._fadeStarted = false;
             }, fadeTime * 1000);
