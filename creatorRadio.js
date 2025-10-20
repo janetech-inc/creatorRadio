@@ -11,7 +11,8 @@
  * Released on: December 30, 2024
  */
 !function(t, e, n, i) {
-    
+
+    let isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     var r = {
         autoplay: !0,
         crossfadeDuration: 2 // seconds for fade in/out
@@ -87,22 +88,39 @@
             t.targetSets[u.targetSetId] && t.targetSets[u.targetSetId].removeClass("is-buffering"),
             t.setPlayerState("playing", u),
             "mediaSession"in navigator && (navigator.mediaSession.playbackState = "playing")
+        
+            if (isIOS) {
+                clearInterval(t._iosTimer);
+                t._iosTimer = setInterval(() => {
+                    if (t.audio.paused || t._fadeStarted) return;
+        
+                    const duration = t.audio.duration;
+                    const currentTime = t.audio.currentTime;
+        
+                    if (duration && currentTime >= duration - fadeBeforeEnd) {
+                        t._fadeStarted = true;
+                        t.playNextSong();
+                    }
+                }, 200);
+            }
         }),
         this.audio.addEventListener("pause", function() {
             t.setPlayerState("paused", u),
             "mediaSession"in navigator && (navigator.mediaSession.playbackState = "paused")
+            if (isIOS && t._iosTimer) clearInterval(t._iosTimer);
         }),
         this.audio.addEventListener("waiting", function() {
             t.targetSets[u.targetSetId] && t.targetSets[u.targetSetId].addClass("is-buffering")
         }), 
-            /*
+    
         this.audio.addEventListener("ended", function() {
-            if (t._isCrossFading) return;
+          /*  if (t._isCrossFading) return;
             
             for (var e = truePlayerEventManager.getEventWatchers("audioEnded"), n = 0; n < e.length; n++)
                 e[n].callback(t);
-            1 == t.songs.length || t.isDragging || 0 == t.settings.autoplay ? t.stopCurrentSong() : t.playNextSong() 
-        }), */
+            1 == t.songs.length || t.isDragging || 0 == t.settings.autoplay ? t.stopCurrentSong() : t.playNextSong() */
+            if (isIOS && t._iosTimer) clearInterval(t._iosTimer);
+        }), 
         this.audio.addEventListener("loadedmetadata", function() {
             var e = parseInt(u.audio.duration / 60, 10)
               , n = parseInt(u.audio.duration % 60);
