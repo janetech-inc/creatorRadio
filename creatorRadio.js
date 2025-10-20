@@ -473,20 +473,22 @@
             }
 
 
+            const now = context.currentTime;
+            
             // Reset and start fade
-            currentSong.gainNode.gain.setValueAtTime(1, context.currentTime);
-            nextSong.gainNode.gain.setValueAtTime(0, context.currentTime);
+            currentSong.gainNode.gain.setValueAtTime(1, now);
+            nextSong.gainNode.gain.setValueAtTime(0, now);
         
             // Prepare and play next song
             nextSong.audio.currentTime = 0;
             nextSong.audio.volume = this.getVolume();
             nextSong.audio.play().catch(err => console.warn("Playback blocked", err));
-        
+            
             // Fade between
-         //   currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + fadeTime);
+         //   currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, context. fadeTime);
            // nextSong.gainNode.gain.linearRampToValueAtTime(1, context.currentTime + fadeTime);
-            this.fadeOut(currentSong.type, currentSong, context.currentTime + fadeTime);
-            this.fadeIn(nextSong.type, nextSong, context.currentTime + fadeTime);
+            this.fadeOut(currentSong.type, currentSong, now + fadeTime);
+            this.fadeIn(nextSong.type, nextSong, now + fadeTime);
         
             // Stop old track after fade completes
             setTimeout(() => {
