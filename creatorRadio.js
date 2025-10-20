@@ -427,25 +427,7 @@
             // Prepare and play next song
             nextSong.audio.currentTime = 0;
             nextSong.audio.volume = this.getVolume();
-
-            // Unlock next song for Safari by playing and immediately pausing if needed
-            if (nextSong.audio.paused && isIOS) {
-                nextSong.audio.play()
-                    .then(() => {
-                        nextSong.audio.pause();
-                        nextSong.audio.currentTime = 0;
-                        // Now safe to play
-                        nextSong.audio.play().catch(err => console.warn("Playback blocked", err));
-                    })
-                    .catch(err => {
-                        console.warn("Playback blocked, user gesture required", err);
-                    });
-            } else {
-                // If already unlocked, play normally
-                nextSong.audio.play().catch(err => console.warn("Playback blocked", err));
-            }
-                    
-          //  nextSong.audio.play();
+            nextSong.audio.play().catch(err => console.warn("Playback blocked", err));
         
             // Fade between
             currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + fadeTime);
@@ -611,17 +593,9 @@
             t(s).on("click", function(t) {
                 var e = n.songs.map(function(t, e) {
                     if (isIOS && t._iosUnlocked) {
-                        if (t.audio.paused) {
-                            const p = t.audio.play();
-                            if (p && p.then) {
-                                p.then(() => {
-                                    // Immediately pause, reset to 0
-                                    t.audio.pause();
-                                    t.audio.currentTime = 0;
-                                }).catch(() => {});
-                            }
-                            t._iosUnlocked = true
-                        } 
+                        t.audio.play();
+                        t.audio.pause();
+                        t.audio.currentTime = 0; 
                     }
                     return songMap = {
                         globalIndex: e,
