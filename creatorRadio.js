@@ -596,6 +596,7 @@
                         t.audio.play();
                         t.audio.pause();
                         t.audio.currentTime = 0; 
+                        t._iosUnlocked = true;
                     }
                     return songMap = {
                         globalIndex: e,
