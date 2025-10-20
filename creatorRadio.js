@@ -252,9 +252,9 @@
             e.truePlayerManager.activePlayer = this,
             this.getCurrentSong().audio.play(),
             //preload next song
-            this.getNextSong().audio.play(),
-            this.getNextSong().audio.pause(),
-            this.getNextSong().audio.currentTime = 0
+          //  this.getNextSong().audio.play(),
+           // this.getNextSong().audio.pause(),
+            //this.getNextSong().audio.currentTime = 0
         },
         stopCurrentSong: function() {
             this.pauseCurrentSong(),
@@ -431,7 +431,25 @@
             // Prepare and play next song
             nextSong.audio.currentTime = 0;
             nextSong.audio.volume = this.getVolume();
-            nextSong.audio.play();
+
+            // Unlock next song for Safari by playing and immediately pausing if needed
+            if (nextSong.audio.paused) {
+                nextSong.audio.play()
+                    .then(() => {
+                        nextSong.audio.pause();
+                        nextSong.audio.currentTime = 0;
+                        // Now safe to play
+                        nextSong.audio.play().catch(err => console.warn("Playback blocked", err));
+                    })
+                    .catch(err => {
+                        console.warn("Playback blocked, user gesture required", err);
+                    });
+            } else {
+                // If already unlocked, play normally
+                nextSong.audio.play().catch(err => console.warn("Playback blocked", err));
+            }
+                    
+          //  nextSong.audio.play();
         
             // Fade between
             currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + fadeTime);
