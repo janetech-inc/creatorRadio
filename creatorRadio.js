@@ -326,11 +326,8 @@
             this.songs.forEach(song => {
                 try {
                     song.audio.volume = 0;
-                    song.audio.play().then(() => {
-                        song.audio.pause();
-                        song.audio.currentTime = 0;
-                        song.audio.volume = this.getVolume();
-                    }).catch(()=>{});
+                    song.audio.play();
+                    song.audio.pause();
                 } catch(e) {}
             });
             this._iosUnlocked = true;
