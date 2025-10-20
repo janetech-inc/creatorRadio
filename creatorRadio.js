@@ -385,6 +385,7 @@
         playNextSong: function() {
            if (this.songs.length <= 1) return false;
             const currentSong = this.getCurrentSong();
+            const currentIndex = this.getCurrentSongIndex();
             const nextIndex = this.songs[currentIndex + 1] ? currentIndex + 1 : 0;
             const nextSong = this.getNextSong()
             const fadeTime = this.settings.crossfadeDuration || 2;
