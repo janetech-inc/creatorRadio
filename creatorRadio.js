@@ -138,6 +138,7 @@
         this.settings = t.extend({}, r, n),
         this._defaults = r,
         this.init()
+        
     }
     s.prototype = {
         init: function() {
@@ -231,6 +232,18 @@
             this.initAjaxLoadObserver(),
             this.initMediaAPIActions(),
             this.setCurrentSong(0)) : console.error("There are no songs in the player.")
+
+            if (isIOS) {
+                 // --- Attach iOS unlock on first user gesture ---
+                document.addEventListener("touchstart", () => {
+                    if (!this._iosUnlocked) this.unlockAudioContext();
+                }, { once: true });
+                
+                document.addEventListener("click", () => {
+                    if (!this._iosUnlocked) this.unlockAudioContext();
+                }, { once: true });
+            }
+           
         },
         getVolume: function() {
             return this._volume
@@ -300,6 +313,28 @@
             this.$artistName.text(e.artist),
             this.$duration.text(e.durationString),
             this.$genre.text(e.genre)
+        },
+        unlockAudioContext: function() {
+            const firstSong = this.songs && this.songs[0];
+            const ctx = firstSong && firstSong.getAudioContext ? firstSong.getAudioContext() : null;
+            
+            if (ctx && ctx.state === "suspended") {
+                ctx.resume().catch(()=>{});
+            }
+        
+            // Prime all tracks silently
+            this.songs.forEach(song => {
+                try {
+                    song.audio.volume = 0;
+                    song.audio.play().then(() => {
+                        song.audio.pause();
+                        song.audio.currentTime = 0;
+                        song.audio.volume = this.getVolume();
+                    }).catch(()=>{});
+                } catch(e) {}
+            });
+            this._iosUnlocked = true;
+            console.log("✅ iOS audio unlocked");
         },
         initProgressBarEvents: function() {
             var n = this;
@@ -592,12 +627,6 @@
             });
             t(s).on("click", function(t) {
                 var e = n.songs.map(function(t, e) {
-                    if (isIOS && t._iosUnlocked) {
-                        t.audio.play();
-                        t.audio.pause();
-                        t.audio.currentTime = 0; 
-                        t._iosUnlocked = true;
-                    }
                     return songMap = {
                         globalIndex: e,
                         song: t
@@ -810,5 +839,6 @@
     }
     ,
     e.truePlayerManager.initializePlayers();
+
     console.log(`%cTrue Audio Player`, ["font-size: 1.25rem", "font-weight: bold", "line-height: 1.3", "font-family: Montserrat, Poppins, Helvetica, sans-serif", "color: rgb(33, 33, 33)", "background: rgb(206, 234, 104)", "padding: 0.75rem 1rem", "border-radius: 0.25rem"].join(";"), '\n\nThis website uses the True Audio Player by Uplift Web Design. For documentation, visit https://www.upliftwebdesign.com/true-audio-player/getting-started');
 }($, window, document);
