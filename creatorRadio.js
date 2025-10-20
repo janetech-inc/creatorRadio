@@ -433,7 +433,7 @@
             nextSong.audio.volume = this.getVolume();
 
             // Unlock next song for Safari by playing and immediately pausing if needed
-            if (nextSong.audio.paused) {
+            if (nextSong.audio.paused && isIOS) {
                 nextSong.audio.play()
                     .then(() => {
                         nextSong.audio.pause();
