@@ -368,28 +368,35 @@
     
             // Reuse a single AudioContext per crossfade
             const context = currentSong.getAudioContext();
+            
+            // iOS Safari fix
+            if (context.state === 'suspended') {
+                context.resume().catch(() => {});
+            }
 
-            if (!nextSong.audio.paused && "paused" != this.getPlayerState()) {
-               // return;
+            try { 
+                 // Create or reuse source nodes
+                if (!currentSong.sourceNode)
+                    currentSong.sourceNode = context.createMediaElementSource(currentSong.audio);
+            
+                if (!nextSong.sourceNode)
+                    nextSong.sourceNode = context.createMediaElementSource(nextSong.audio);
+            
+                // Create gain nodes for each track (store them so we can reuse)
+                if (!currentSong.gainNode) {
+                    currentSong.gainNode = context.createGain();
+                    currentSong.sourceNode.connect(currentSong.gainNode).connect(context.destination);
+                }
+            
+                if (!nextSong.gainNode) {
+                    nextSong.gainNode = context.createGain();
+                    nextSong.sourceNode.connect(nextSong.gainNode).connect(context.destination);
+                }
             }
-                
-            // Create or reuse source nodes
-            if (!currentSong.sourceNode)
-                currentSong.sourceNode = context.createMediaElementSource(currentSong.audio);
-        
-            if (!nextSong.sourceNode)
-                nextSong.sourceNode = context.createMediaElementSource(nextSong.audio);
-        
-            // Create gain nodes for each track (store them so we can reuse)
-            if (!currentSong.gainNode) {
-                currentSong.gainNode = context.createGain();
-                currentSong.sourceNode.connect(currentSong.gainNode).connect(context.destination);
+            catch (err) {
+                console.warn("MediaElementSource already exists:", err);
             }
-        
-            if (!nextSong.gainNode) {
-                nextSong.gainNode = context.createGain();
-                nextSong.sourceNode.connect(nextSong.gainNode).connect(context.destination);
-            }
+
 
             // Reset and start fade
             currentSong.gainNode.gain.setValueAtTime(1, context.currentTime);
@@ -424,6 +431,14 @@
             const currentSong = this.getCurrentSong();
             const prevSong = this.songs[prevIndex];
             const fadeTime = this.settings.crossfadeDuration || 2;
+
+             // Mark that crossfade is in progres
+            this._isCrossfading = true;
+            
+                  // iOS Safari fix
+            if (context.state === 'suspended') {
+                context.resume().catch(() => {});
+            }
         
              // Reuse a single AudioContext per crossfade
             const context = currentSong.getAudioContext(); 
@@ -474,7 +489,7 @@
                  this.setPlayerState("playing", prevSong);
                 this._isCrossfading = false;
                 this._fadeStarted = false;
-            }, fadeTime * 1500);
+            }, fadeTime * 1000);
         },
         setPlayerState: function(t, e) {
             if (t == this._playerState)
