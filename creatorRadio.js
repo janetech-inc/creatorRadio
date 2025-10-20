@@ -92,10 +92,10 @@
             if (isIOS) {
                 clearInterval(t._iosTimer);
                 t._iosTimer = setInterval(() => {
-                    if (this.audio.paused || this._fadeStarted) return;
+                    if (this.paused || this._fadeStarted) return;
         
-                    const duration = this.audio.duration;
-                    const currentTime = this.audio.currentTime;
+                    const duration = this.duration;
+                    const currentTime = this.currentTime;
         
                     if (duration && currentTime >= duration - fadeBeforeEnd) {
                         this._fadeStarted = true;
