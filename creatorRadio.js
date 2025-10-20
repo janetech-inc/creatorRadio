@@ -92,14 +92,14 @@
             if (isIOS) {
                 clearInterval(t._iosTimer);
                 t._iosTimer = setInterval(() => {
-                    if (this.paused || this._fadeStarted) return;
+                    if (this.paused || t._fadeStarted) return;
         
                     const duration = this.duration;
                     const currentTime = this.currentTime;
         
                     if (duration && currentTime >= duration - fadeBeforeEnd) {
-                        this._fadeStarted = true;
-                        this.playNextSong();
+                        t._fadeStarted = true;
+                        t.playNextSong();
                     }
                 }, 200);
             }
