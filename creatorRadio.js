@@ -413,22 +413,22 @@
             this.setVolume(i)
         },
 
-        fadeIn: function(type, song, fadeTime) {
+        fadeIn: function(type, song, startTime, fadeTime) {
             switch (type) {
-                case 'promo': return song.gainNode.gain.linearRampToValueAtTime(1, fadeTime);
-                case 'liner': return song.gainNode.gain.exponentialRampToValueAtTime(0.01, fadeTime);
-                case 'show': return song.gainNode.gain.exponentialRampToValueAtTime(0.01, fadeTime);  
-                case 'music': return song.gainNode.gain.linearRampToValueAtTime(1, fadeTime);
+                case 'promo': return song.gainNode.gain.linearRampToValueAtTime(1, startTime + fadeTime);
+                case 'liner': return song.gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + fadeTime);
+                case 'show': return song.gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + fadeTime);  
+                case 'music': return song.gainNode.gain.linearRampToValueAtTime(1, startTime + fadeTime);
                 default: return song.gainNode.gain.linearRampToValueAtTime(1, fadeTime);
               }
         },  
-        fadeOut: function(type, song, fadeTime) {
+        fadeOut: function(type, song, startTime, fadeTime) {
             switch (type) {
-                case 'promo': return song.gainNode.gain.linearRampToValueAtTime(1, fadeTime);
-                case 'liner': return  song.gainNode.gain.linearRampToValueAtTime(1, fadeTime);
+                case 'promo': return song.gainNode.gain.linearRampToValueAtTime(1, startTime + fadeTime);
+                case 'liner': return  song.gainNode.gain.linearRampToValueAtTime(1, startTime + fadeTime);
                 case 'show': return;  
-                case 'music': return song.gainNode.gain.exponentialRampToValueAtTime(0.01, fadeTime);
-                default: return song.gainNode.gain.linearRampToValueAtTime(1, fadeTime);
+                case 'music': return song.gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + fadeTime);
+                default: return song.gainNode.gain.linearRampToValueAtTime(1, startTime + fadeTime);
               }
         }, 
         playNextSong: function() {
@@ -472,9 +472,6 @@
                 console.warn("MediaElementSource already exists:", err);
             }
 
-
-            const now = context.currentTime;
-            
             // Reset and start fade
             currentSong.gainNode.gain.setValueAtTime(1, now);
             nextSong.gainNode.gain.setValueAtTime(0, now);
@@ -487,8 +484,8 @@
             // Fade between
          //   currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, context. fadeTime);
            // nextSong.gainNode.gain.linearRampToValueAtTime(1, context.currentTime + fadeTime);
-            this.fadeOut(currentSong.type, currentSong, now + fadeTime);
-            this.fadeIn(nextSong.type, nextSong, now + fadeTime);
+            this.fadeOut(currentSong.type, currentSong, context.currentTime, fadeTime);
+            this.fadeIn(nextSong.type, nextSong, context.currentTime, fadeTime);
         
             // Stop old track after fade completes
             setTimeout(() => {
@@ -558,8 +555,8 @@
           //  currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, now + fadeTime);
            // prevSong.gainNode.gain.linearRampToValueAtTime(1, now + fadeTime);
 
-            this.fadeOut(currentSong.type, currentSong, now + fadeTime);
-            this.fadeIn(prevSong.type, prevSong, now + fadeTime);
+            this.fadeOut(currentSong.type, currentSong, now, fadeTime);
+            this.fadeIn(prevSong.type, prevSong, now, fadeTime);
           
             // After fade, stop the current song and set state
             setTimeout(() => {
