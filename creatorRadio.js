@@ -420,7 +420,7 @@
           switch (type) {
             case 'liner':
             case 'show':
-              g.exponentialRampToValueAtTime(1, startTime + fadeDuration);
+             // g.exponentialRampToValueAtTime(1, startTime + fadeDuration);
               break;
             case 'music':
             case 'promo':
