@@ -411,25 +411,40 @@
               , n = this.$volumeBarWrapper.width()
               , i = (e - this.$volumeBarWrapper.offset().left) / n;
             this.setVolume(i)
+        },  
+        fadeIn(type, song, startTime, fadeDuration) {
+          const g = song.gainNode.gain;
+          g.cancelScheduledValues(startTime);
+          g.setValueAtTime(0.001, startTime);
+        
+          switch (type) {
+            case 'liner':
+            case 'show':
+              g.exponentialRampToValueAtTime(1, startTime + fadeDuration);
+              break;
+            case 'music':
+            case 'promo':
+            default:
+              g.linearRampToValueAtTime(1, startTime + fadeDuration);
+          }
         },
 
-        fadeIn: function(type, song, startTime, fadeTime) {
-            switch (type) {
-                case 'promo': return song.gainNode.gain.linearRampToValueAtTime(1, startTime + fadeTime);
-                case 'liner': return song.gainNode.gain.exponentialRampToValueAtTime(1.0, startTime + fadeTime);
-                case 'show': return song.gainNode.gain.exponentialRampToValueAtTime(1.0, startTime + fadeTime);  
-                case 'music': return song.gainNode.gain.linearRampToValueAtTime(1, startTime + fadeTime);
-                default: return song.gainNode.gain.linearRampToValueAtTime(1, fadeTime);
-              }
-        },  
-        fadeOut: function(type, song, startTime, fadeTime) {
-            switch (type) {
-                case 'promo': return song.gainNode.gain.linearRampToValueAtTime(0, startTime + fadeTime);
-                case 'liner': return;  
-                case 'show': return;  
-                case 'music': return song.gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + fadeTime);
-                default: return song.gainNode.gain.linearRampToValueAtTime(0, startTime + fadeTime);
-              }
+        fadeOut(type, song, startTime, fadeDuration) {
+          const g = song.gainNode.gain;
+          g.cancelScheduledValues(startTime);
+          g.setValueAtTime(g.value, startTime);
+        
+          switch (type) {
+            case 'music':
+              g.exponentialRampToValueAtTime(0.001, startTime + fadeDuration);
+              break;
+            case 'liner':
+            case 'show':
+                break;
+            case 'promo':
+            default:
+              g.linearRampToValueAtTime(0, startTime + fadeDuration);
+          }
         }, 
         playNextSong: function() {
            if (this.songs.length <= 1) return false;
