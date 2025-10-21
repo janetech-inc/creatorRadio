@@ -473,8 +473,8 @@
             }
 
             // Reset and start fade
-            currentSong.gainNode.gain.setValueAtTime(1, now);
-            nextSong.gainNode.gain.setValueAtTime(0, now);
+            currentSong.gainNode.gain.setValueAtTime(1, context.currentTime);
+            nextSong.gainNode.gain.setValueAtTime(0, context.currentTime);
         
             // Prepare and play next song
             nextSong.audio.currentTime = 0;
