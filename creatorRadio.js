@@ -424,11 +424,11 @@
         },  
         fadeOut: function(type, song, startTime, fadeTime) {
             switch (type) {
-                case 'promo': return song.gainNode.gain.linearRampToValueAtTime(1, startTime + fadeTime);
-                case 'liner': return  song.gainNode.gain.linearRampToValueAtTime(1, startTime + fadeTime);
+                case 'promo': return song.gainNode.gain.linearRampToValueAtTime(0, startTime + fadeTime);
+                case 'liner': return  song.gainNode.gain.linearRampToValueAtTime(0, startTime + fadeTime);
                 case 'show': return;  
                 case 'music': return song.gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + fadeTime);
-                default: return song.gainNode.gain.linearRampToValueAtTime(1, startTime + fadeTime);
+                default: return song.gainNode.gain.linearRampToValueAtTime(0, startTime + fadeTime);
               }
         }, 
         playNextSong: function() {
