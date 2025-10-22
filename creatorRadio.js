@@ -505,11 +505,12 @@
         
             // Stop old track after fade completes
             setTimeout(() => {
-                // Reset crossfade flag
-                this._isCrossfading = false;
-                this._fadeStarted = false;
+                currentSong.audio.pause();
+                currentSong.audio.currentTime = 0;
                 this.setCurrentSong(nextIndex, false);
                 this.setPlayerState("playing", nextSong);
+                this._isCrossfading = false;
+                this._fadeStarted = false;
             }, fadeTime * 1000);
             
         },
@@ -576,6 +577,8 @@
           
             // After fade, stop the current song and set state
             setTimeout(() => {
+                currentSong.audio.pause();
+                currentSong.audio.currentTime = 0;
                 this.setCurrentSong(prevIndex, false);
                 this.setPlayerState("playing", prevSong);
                 this._isCrossfading = false;
