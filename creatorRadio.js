@@ -328,7 +328,7 @@
             this.songs.forEach(song => {
                 try {
                     song.audio.volume = 0;
-                    song.audio.play();
+                    song.audio.play().catch(()=>{});
                     song.audio.pause();
                 } catch(e) {}
             });
