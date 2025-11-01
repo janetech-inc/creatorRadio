@@ -26,7 +26,7 @@
         this.$parentElem,
         this.audio = new Audio,
         this.audio.crossOrigin = "anonymous";
-        this.audio.preload = e || "auto";
+        this.audio.preload = "auto";
         var l = n.createElement("source");
         l.setAttribute("src", e),
         a && (a = a.replace("\\", "/"),
