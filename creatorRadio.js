@@ -298,7 +298,7 @@
             if (!e) return console.error("Song with index " + t + " not found."), !1;
 
             if(l) {   
-                e.preload = "metadata";
+             //   e.preload = "metadata";
                 //e.audio.load();     
             }
    
