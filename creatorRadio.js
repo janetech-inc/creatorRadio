@@ -62,6 +62,21 @@
         this.getAudioContext = function() {
          if (!t._audioContext) {
             t._audioContext = new (window.AudioContext || window.webkitAudioContext)();
+             t._audioContext.onstatechange = () => {
+                  if (audioContext.state === 'interrupted') {
+                    console.log('AudioContext was interrupted by the UA.');
+                    context.resume().catch(() => {});
+                    // Handle the pause in your application logic
+                  } else if (audioContext.state === 'running') {
+                    console.log('AudioContext is running.');
+                    // Resume your application logic
+                  }
+                    // iOS Safari fix
+                    else if (context.state === 'suspended') {
+                    console.log('AudioContext was suspended by the UA.');
+                    context.resume().catch(() => {});
+                    }
+                };
             }
             return t._audioContext
         }
@@ -460,10 +475,6 @@
             // Reuse a single AudioContext per crossfade
             const context = currentSong.getAudioContext();
             
-            // iOS Safari fix
-            if (context.state === 'suspended') {
-                context.resume().catch(() => {});
-            }
 
             try { 
                  // Create or reuse source nodes
@@ -525,11 +536,6 @@
 
              // Mark that crossfade is in progres
             this._isCrossfading = true;
-            
-                  // iOS Safari fix
-            if (context.state === 'suspended') {
-                context.resume().catch(() => {});
-            }
         
              // Reuse a single AudioContext per crossfade
             const context = currentSong.getAudioContext(); 
