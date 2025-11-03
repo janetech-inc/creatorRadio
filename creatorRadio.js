@@ -430,7 +430,7 @@
         fadeIn(type, song, startTime, fadeDuration) {
           const g = song.gainNode.gain;
           g.cancelScheduledValues(startTime);
-        //  g.setValueAtTime(0.001, startTime);
+          g.setValueAtTime(0.001, startTime);
         
           switch (type) {
             case 'liner':
