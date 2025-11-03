@@ -63,16 +63,16 @@
          if (!t._audioContext) {
             t._audioContext = new (window.AudioContext || window.webkitAudioContext)();
              t._audioContext.onstatechange = () => {
-                  if (audioContext.state === 'interrupted') {
+                  if (t._audioContext.state === 'interrupted') {
                     console.log('AudioContext was interrupted by the UA.');
                     context.resume().catch(() => {});
                     // Handle the pause in your application logic
-                  } else if (audioContext.state === 'running') {
+                  } else if (t._audioContext.state === 'running') {
                     console.log('AudioContext is running.');
                     // Resume your application logic
                   }
                     // iOS Safari fix
-                    else if (context.state === 'suspended') {
+                    else if (t._audioContext.state === 'suspended') {
                     console.log('AudioContext was suspended by the UA.');
                     context.resume().catch(() => {});
                     }
