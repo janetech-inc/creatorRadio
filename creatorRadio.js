@@ -430,12 +430,12 @@
         fadeIn(type, song, startTime, fadeDuration) {
           const g = song.gainNode.gain;
           g.cancelScheduledValues(startTime);
-          g.setValueAtTime(0.001, startTime);
+        //  g.setValueAtTime(0.001, startTime);
         
           switch (type) {
             case 'liner':
             case 'show':
-              g.exponentialRampToValueAtTime(1, startTime + 0.01);
+              g.exponentialRampToValueAtTime(1, startTime + 0.0001);
               break;
             case 'music':
             case 'promo':
@@ -455,7 +455,7 @@
               break;
             case 'liner':
             case 'show':
-                g.exponentialRampToValueAtTime(1, startTime + 0.01);
+                g.exponentialRampToValueAtTime(1, startTime + 0.0001);
                 break;
             case 'promo':
             default:
