@@ -283,6 +283,7 @@
             this.getCurrentSong().audio.volume = this.getVolume(),
             e.truePlayerManager.activePlayer = this,
             this.getCurrentSong().audio.play().catch(err => console.warn("Playback blocked", err));
+            this.settings.crossfadeDuration = this.fadeType( this.getCurrentSong().type, this.getNextSong().type);
         },
         stopCurrentSong: function() {
             this.pauseCurrentSong(),
@@ -462,12 +463,33 @@
               g.linearRampToValueAtTime(0, startTime + fadeDuration);
           }
         }, 
+
+        fadeType(outType, inType) {
+          switch (outType) {
+            case 'promo':
+            case 'music':
+              return this.settings.fadeTime;
+              break;
+            case 'liner':
+            case 'show':
+                switch (inType) {
+                    case 'music':
+                    case 'promo':
+                        return 1;
+                    default:
+                      return 0.3;
+              }
+            default:
+               return this.settings.fadeTime;
+          }
+        }, 
         playNextSong: function() {
            if (this.songs.length <= 1) return false;
             const currentSong = this.getCurrentSong();
             const currentIndex = this.getCurrentSongIndex();
             const nextIndex = this.songs[currentIndex + 1] ? currentIndex + 1 : 0;
             const nextSong = this.getNextSong()
+            this.settings.crossfadeDuration = this.fadeType(currentSong.type, nextSong.type);
             const fadeTime = this.settings.crossfadeDuration || 2;
             // Mark that crossfade is in progres
             this._isCrossfading = true;
