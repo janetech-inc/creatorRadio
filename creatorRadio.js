@@ -455,7 +455,7 @@
               break;
             case 'liner':
             case 'show':
-                g.exponentialRampToValueAtTime(0.001, startTime + 0.0001);
+                g.exponentialRampToValueAtTime(1, startTime + 0.0001);
                 break;
             case 'promo':
             default:
