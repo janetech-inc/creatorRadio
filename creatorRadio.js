@@ -60,7 +60,9 @@
         }
         ,
         this.getAudioContext = function() {
-         if (!this._audioContext) {
+
+        return new (window.AudioContext || window.webkitAudioContext)();
+       /*  if (!this._audioContext) {
             this._audioContext = new (window.AudioContext || window.webkitAudioContext)();
              this._audioContext.onstatechange = () => {
                   if (this._audioContext.state === 'interrupted') {
@@ -78,7 +80,7 @@
                     }
                 };
             }
-            return this._audioContext
+            return this._audioContext */
         }
         ,   
         this.audio.addEventListener("timeupdate", function(e) {
