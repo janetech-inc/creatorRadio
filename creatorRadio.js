@@ -255,11 +255,11 @@
             if (isIOS) {
                  // --- Attach iOS unlock on first user gesture ---
                 document.addEventListener("touchstart", () => {
-                  //  if (!this._iosUnlocked) this.unlockAudioContext();
+                    if (!this._iosUnlocked) this.unlockAudioContext();
                 }, { once: true });
                 
                 document.addEventListener("click", () => {
-                   // if (!this._iosUnlocked) this.unlockAudioContext();
+                   if (!this._iosUnlocked) this.unlockAudioContext();
                 }, { once: true });
             }
            
@@ -335,18 +335,16 @@
         },
         unlockAudioContext: function() {
             const firstSong = this.songs && this.songs[0];
-            const ctx = firstSong && firstSong.getAudioContext ? firstSong.getAudioContext() : null;
-            
-            if (ctx && ctx.state === "suspended") {
-                ctx.resume().catch(()=>{});
-            }
+            const ctx = firstSong && firstSong.getAudioContext() : null;
+        
         
             // Prime all tracks silently
             this.songs.forEach(song => {
                 try {
                     song.audio.volume = 0;
-                    song.audio.play().catch(()=>{});
+                    song.audio.play().catch(err => console.warn("Playback blocked", err));
                     song.audio.pause();
+                    song.audio.volume = this.getVolume();
                 } catch(e) {}
             });
             this._iosUnlocked = true;
