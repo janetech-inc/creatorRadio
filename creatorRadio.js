@@ -62,25 +62,7 @@
         this.getAudioContext = function() {
 
         //return new (window.AudioContext || window.webkitAudioContext)();
-         if (!this._audioContext) {
-            this._audioContext = new (window.AudioContext || window.webkitAudioContext)();
-             this._audioContext.onstatechange = () => {
-                  if (this._audioContext.state === 'interrupted') {
-                    console.log('AudioContext was interrupted by the UA.');
-                    this._audioContext.resume().catch(() => {});
-                    // Handle the pause in your application logic
-                  } else if (this._audioContext.state === 'running') {
-                    console.log('AudioContext is running.');
-                    // Resume your application logic
-                  }
-                    // iOS Safari fix
-                    else if (this._audioContext.state === 'suspended') {
-                    console.log('AudioContext was suspended by the UA.');
-                    this._audioContext.resume().catch(() => {});
-                    }
-                };
-            }
-            return this._audioContext 
+            return t._audioContext 
         }
         ,   
         this.audio.addEventListener("timeupdate", function(e) {
@@ -106,7 +88,28 @@
             t.targetSets[u.targetSetId] && t.targetSets[u.targetSetId].removeClass("is-buffering"),
             t.setPlayerState("playing", u),
             "mediaSession"in navigator && (navigator.mediaSession.playbackState = "playing")
-        
+
+            if (!t._audioContext) {
+                t._audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                t._audioContext.onstatechange = () => {
+                
+                    if (t._audioContext.state === 'interrupted') {
+                        console.log('AudioContext was interrupted by the UA.');
+                        t._audioContext.resume().catch(() => {});
+                        // Handle the pause in your application logic
+                      } 
+                    else if (t._audioContext.state === 'running') {
+                        console.log('AudioContext is running.');
+                        // Resume your application logic
+                    }
+                    // iOS Safari fix
+                    else if (t._audioContext.state === 'suspended') {
+                        console.log('AudioContext was suspended by the UA.');
+                        t._audioContext.resume().catch(() => {});
+                    }
+                };
+            }
+            
             if (isIOS) {
                 clearInterval(t._iosTimer);
                 t._iosTimer = setInterval(() => {
