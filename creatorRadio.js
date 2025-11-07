@@ -475,7 +475,7 @@
                 switch (inType) {
                     case 'music':
                     case 'promo':
-                        return 1;
+                        return 1.5;
                     default:
                       return 0.3;
               }
