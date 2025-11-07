@@ -280,7 +280,7 @@
             this.playButton.hide(),
             this.getCurrentSong().audio.volume = this.getVolume(),
             e.truePlayerManager.activePlayer = this,
-            this.getCurrentSong().audio.play()
+            this.getCurrentSong().audio.play().catch(err => console.warn("Playback blocked", err));
         },
         stopCurrentSong: function() {
             this.pauseCurrentSong(),
