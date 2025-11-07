@@ -335,7 +335,7 @@
         },
         unlockAudioContext: function() {
             const firstSong = this.songs && this.songs[0];
-            const ctx = firstSong && firstSong.getAudioContext() : null;
+            const ctx = firstSong.getAudioContext();
         
         
             // Prime all tracks silently
