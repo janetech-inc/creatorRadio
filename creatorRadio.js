@@ -78,7 +78,7 @@
                     }
                 };
             }
-            return t._audioContext
+            return this._audioContext
         }
         ,   
         this.audio.addEventListener("timeupdate", function(e) {
