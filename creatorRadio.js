@@ -255,11 +255,11 @@
             if (isIOS) {
                  // --- Attach iOS unlock on first user gesture ---
                 document.addEventListener("touchstart", () => {
-                    if (!this._iosUnlocked) this.unlockAudioContext();
+                  //  if (!this._iosUnlocked) this.unlockAudioContext();
                 }, { once: true });
                 
                 document.addEventListener("click", () => {
-                    if (!this._iosUnlocked) this.unlockAudioContext();
+                   // if (!this._iosUnlocked) this.unlockAudioContext();
                 }, { once: true });
             }
            
