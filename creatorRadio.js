@@ -533,10 +533,7 @@
                 }
             
                 if (!nextSong.gainNode) {
-                    const source = context.createBufferSource();
-                    source.buffer = nextSong.audioBuffer;
                     nextSong.gainNode = context.createGain();
-                    source.connect(gainNode);
                     nextSong.sourceNode.connect(nextSong.gainNode).connect(context.destination);
                 }
             }
