@@ -281,7 +281,7 @@
                     song.audioBuffer = buffer;
                 })
                 .catch(err => console.warn("Failed to preload song:", err));
-        }
+        },
         
         getVolume: function() {
             return this._volume
