@@ -353,21 +353,6 @@
             this.$duration.text(e.durationString),
             this.$genre.text(e.genre)
         },
-        async preload: function() {
-
-            // Prime all tracks silently
-            this.songs.forEach(song => {
-                try {
-                  const buffer = await this.loadTrack(song.); // fetch + decode
-                  this.scheduleTrack(buffer);   
-                } catch(e) {}
-            });
-    
-        },
-            console.log("✅ audio preloaded");
-            
-        },
-        
         unlockAudioContext: function() {
             const firstSong = this.songs && this.songs[0];
             const ctx = firstSong.getAudioContext();
