@@ -274,7 +274,7 @@
             const player = this;
             if (!song || song.audioBuffer) return; // already preloaded
         
-            fetch(song.audio.src)
+            fetch(song.audio.currentSrc)
                 .then(res => res.arrayBuffer())
                 .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
                 .then(buffer => {
