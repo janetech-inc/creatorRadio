@@ -555,7 +555,7 @@
             // Prepare and play next song
             nextSong.audio.currentTime = 0;
             nextSong.audio.volume = this.getVolume();
-            nextSong.sourceNode.start(0);
+            nextSong.sourceNode.start(context.currentTime);
          //   nextSong.audio.play().catch(err => console.warn("Playback blocked", err));
             
             // Fade between
