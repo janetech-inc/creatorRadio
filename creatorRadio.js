@@ -523,8 +523,8 @@
                  // Create or reuse source nodes
                 if (!currentSong.sourceNode)
                 {
-                    currentSong.sourceNode = context.createBufferSource();
-                    currentSong.sourceNode.buffer = currentSong.audioBuffer;
+                //    currentSong.sourceNode = context.createBufferSource();
+                  //  currentSong.sourceNode.buffer = currentSong.audioBuffer;
                 }
                 
                 if (!nextSong.sourceNode) {
@@ -535,8 +535,8 @@
             
                 // Create gain nodes for each track (store them so we can reuse)
                 if (!currentSong.gainNode) {
-                    currentSong.gainNode = context.createGain();
-                    currentSong.sourceNode.connect(currentSong.gainNode).connect(context.destination);
+                //    currentSong.gainNode = context.createGain();
+                  //  currentSong.sourceNode.connect(currentSong.gainNode).connect(context.destination);
                 }
             
                 if (!nextSong.gainNode) {
