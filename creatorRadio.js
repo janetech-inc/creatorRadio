@@ -535,7 +535,7 @@
             source.start(ctx.currentTime);
 
             song._bufferSource = source;
-            song._gainNode = gainNode;
+            song.gainNode = gainNode;
         },
         playNextSong: function() {
            if (this.songs.length <= 1) return false;
