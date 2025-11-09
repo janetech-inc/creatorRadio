@@ -120,6 +120,12 @@
 
                     if (t.isDragging) return !1;
                     const currentTime = (audioContext.currentTime - t.getCurrentSong().startTime) ;
+
+                    const currentTime = Math.min(
+                        audioContext.currentTime - t.getCurrentSong().startTime,
+                        t.getCurrentSong().audio.duration
+                    );
+                    
                     var n = currentTime
                       , i = t.getCurrentSong().audio.duration;
                     t.updateSongDisplayTime(n, i)
