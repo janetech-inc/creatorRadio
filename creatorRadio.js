@@ -124,7 +124,7 @@
                     t.updateSongDisplayTime(n, i)
                             
                     const duration = this.duration;
-                    const currentTime = this.currentTime;
+                    const currentTime = (audioContext.currentTime - this.startTime) ;
                     const fadeBeforeEnd = t.settings.crossfadeDuration || 2;
                     if (duration && currentTime >= duration - fadeBeforeEnd) {
                         if (this.paused || t._fadeStarted) return;
@@ -541,6 +541,7 @@
 
             song._bufferSource = source;
             song.gainNode = gainNode;
+            song.startTime = ctx.currentTime; 
 
             this.fadeIn(song.type, song, ctx.currentTime, fadeTime);
             source.start(ctx.currentTime);
