@@ -271,6 +271,21 @@
                 }, { once: true });
            
         },
+
+        preloadPlayCurrentSong(fadeTime) {
+            const song = this.getCurrentSong();
+            const player = this;
+            if (!song || song.audioBuffer) return; // already preloaded
+        
+            fetch(song.audio.currentSrc)
+                .then(res => res.arrayBuffer())
+                .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                .then(buffer => {
+                    song.audioBuffer = buffer;
+                    player.playSong(song, 0);
+                })
+                .catch(err => console.warn("Failed to preload song:", err));
+        },
         
         preloadNextSong() {
             const song = this.getNextSong();
@@ -304,8 +319,9 @@
             this.playButton.hide(),
             this.getCurrentSong().audio.volume = this.getVolume(),
             e.truePlayerManager.activePlayer = this,
-            this.getCurrentSong().audio.play().catch(err => console.warn("Playback blocked", err));
+           // this.getCurrentSong().audio.play().catch(err => console.warn("Playback blocked", err));
             this.settings.crossfadeDuration = this.fadeType( this.getCurrentSong().type, this.getNextSong().type);
+            this.preloadPlayCurrentSong(this.settings.crossfadeDuration);
         },
         stopCurrentSong: function() {
             this.pauseCurrentSong(),
@@ -485,7 +501,7 @@
           }
         }, 
 
-        fadeType(outType, inType) {
+        fadeTime(outType, inType) {
           switch (outType) {
             case 'promo':
             case 'music':
@@ -504,13 +520,30 @@
                return this.settings.fadeTime;
           }
         }, 
+        playSong: function(song, fadeTime = 2) {
+            if (!song.audioBuffer) return song.audio.play(); // fallback
+
+            const ctx = audioContext;
+            const source = ctx.createBufferSource();
+            const gainNode = ctx.createGain();
+            source.buffer = song.audioBuffer;
+            source.connect(gainNode);
+            gainNode.connect(ctx.destination);
+
+            gainNode.gain.setValueAtTime(0, ctx.currentTime);
+            this.fadeIn(nextSong.type, nextSong, context.currentTime, fadeTime);
+            source.start(ctx.currentTime);
+
+            song._bufferSource = source;
+            song._gainNode = gainNode;
+        },
         playNextSong: function() {
            if (this.songs.length <= 1) return false;
             const currentSong = this.getCurrentSong();
             const currentIndex = this.getCurrentSongIndex();
             const nextIndex = this.songs[currentIndex + 1] ? currentIndex + 1 : 0;
             const nextSong = this.getNextSong()
-            this.settings.crossfadeDuration = this.fadeType(currentSong.type, nextSong.type);
+            this.settings.crossfadeDuration = this.fadeTime(currentSong.type, nextSong.type);
             const fadeTime = this.settings.crossfadeDuration || 2;
             // Mark that crossfade is in progres
             this._isCrossfading = true;
@@ -519,7 +552,7 @@
             const context = currentSong.getAudioContext();
             
 
-            try { 
+          /*  try { 
                  // Create or reuse source nodes
                 if (!currentSong.sourceNode)
                 {
@@ -535,7 +568,7 @@
             
                 // Create gain nodes for each track (store them so we can reuse)
                 if (!currentSong.gainNode) {
-                //    currentSong.gainNode = context.createGain();
+                //currentSong.gainNode = context.createGain();
                   //  currentSong.sourceNode.connect(currentSong.gainNode).connect(context.destination);
                 }
             
@@ -546,23 +579,24 @@
             }
             catch (err) {
                 console.warn("MediaElementSource already exists:", err);
-            }
+            }*/
 
             // Reset and start fade
-            currentSong.gainNode.gain.setValueAtTime(1, context.currentTime);
-            nextSong.gainNode.gain.setValueAtTime(0, context.currentTime);
+          //  currentSong.gainNode.gain.setValueAtTime(1, context.currentTime);
+         //   nextSong.gainNode.gain.setValueAtTime(0, context.currentTime);
         
             // Prepare and play next song
-            nextSong.audio.currentTime = 0;
-            nextSong.audio.volume = this.getVolume();
-            nextSong.sourceNode.start(context.currentTime);
+            this.playSong(nextSong, fadeTime);
+        //    nextSong.audio.currentTime = 0;
+          //  nextSong.audio.volume = this.getVolume();
+          //  nextSong.sourceNode.start(context.currentTime);
          //   nextSong.audio.play().catch(err => console.warn("Playback blocked", err));
             
             // Fade between
          //   currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, context. fadeTime);
            // nextSong.gainNode.gain.linearRampToValueAtTime(1, context.currentTime + fadeTime);
             this.fadeOut(currentSong.type, currentSong, context.currentTime, fadeTime);
-            this.fadeIn(nextSong.type, nextSong, context.currentTime, fadeTime);
+        
         
             // Stop old track after fade completes
             setTimeout(() => {
@@ -731,7 +765,7 @@
                 e.filter(function(t) {
                     return t.song.id == i
                 }).length > 0 ? n.togglePauseCurrentSong() : (n.stopCurrentSong(),
-                n.setCurrentSong(e[0].globalIndex, true),
+                n.setCurrentSong(e[0].globalIndex, true),                                         
                 n.playCurrentSong())
             }),
             t(e).find('[tmplayer-element="audio"]').hide().each(function(t, i) {
