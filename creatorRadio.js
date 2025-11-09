@@ -530,7 +530,7 @@
                     case 'promo':
                         return 1.5;
                     default:
-                      return 0.3;
+                      return 0.5;
               }
             default:
                return this.settings.fadeTime;
