@@ -76,9 +76,11 @@
             const fadeBeforeEnd = t.settings.crossfadeDuration || 2;
             if (i && n >= i - fadeBeforeEnd && !t._fadeStarted) {
                 t._fadeStarted = true;
-                t.preloadNextSong();
                 t.playNextSong();
             }
+             else {
+                        t.preloadNextSong();
+                    }
         }),
         this.audio.addEventListener("volumechange", function(e) {
             var n = 100 * e.srcElement.volume;
@@ -121,8 +123,9 @@
                     const fadeBeforeEnd = t.settings.crossfadeDuration || 2;
                     if (duration && currentTime >= duration - fadeBeforeEnd) {
                         t._fadeStarted = true;
-                        t.preloadNextSong();
                         t.playNextSong();
+                    } else {
+                        t.preloadNextSong();
                     }
                 }, 200);
             }
