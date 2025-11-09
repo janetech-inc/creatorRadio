@@ -13,6 +13,8 @@
 !function(t, e, n, i) {
 
     let isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
     var r = {
         autoplay: !0,
         crossfadeDuration: 2 // seconds for fade in/out
@@ -60,27 +62,7 @@
         }
         ,
         this.getAudioContext = function() {
-
-        //return new (window.AudioContext || window.webkitAudioContext)();
-         if (!t._audioContext) {
-            t._audioContext = new (window.AudioContext || window.webkitAudioContext)();
-             t._audioContext.onstatechange = () => {
-                  if (t._audioContext.state === 'interrupted') {
-                    console.log('AudioContext was interrupted by the UA.');
-                    t._audioContext.resume().catch(() => {});
-                    // Handle the pause in your application logic
-                  } else if (t._audioContext.state === 'running') {
-                    console.log('AudioContext is running.');
-                    // Resume your application logic
-                  }
-                    // iOS Safari fix
-                    else if (t._audioContext.state === 'suspended') {
-                    console.log('AudioContext was suspended by the UA.');
-                    t._audioContext.resume().catch(() => {});
-                    }
-                };
-            }
-            return t._audioContext 
+            return audioContext;
         }
         ,   
         this.audio.addEventListener("timeupdate", function(e) {
@@ -94,6 +76,7 @@
             const fadeBeforeEnd = t.settings.crossfadeDuration || 2;
             if (i && n >= i - fadeBeforeEnd && !t._fadeStarted) {
                 t._fadeStarted = true;
+                t.preloadNextSong();
                 t.playNextSong();
             }
         }),
@@ -106,7 +89,28 @@
             t.targetSets[u.targetSetId] && t.targetSets[u.targetSetId].removeClass("is-buffering"),
             t.setPlayerState("playing", u),
             "mediaSession"in navigator && (navigator.mediaSession.playbackState = "playing")
-        
+
+            if (!t._audioContext) {
+                t._audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                t._audioContext.onstatechange = () => {
+                
+                    if (t._audioContext.state === 'interrupted') {
+                        console.log('AudioContext was interrupted by the UA.');
+                        t._audioContext.resume().catch(() => {});
+                        // Handle the pause in your application logic
+                      } 
+                    else if (t._audioContext.state === 'running') {
+                        console.log('AudioContext is running.');
+                        // Resume your application logic
+                    }
+                    // iOS Safari fix
+                    else if (t._audioContext.state === 'suspended') {
+                        console.log('AudioContext was suspended by the UA.');
+                        t._audioContext.resume().catch(() => {});
+                    }
+                };
+            }
+            
             if (isIOS) {
                 clearInterval(t._iosTimer);
                 t._iosTimer = setInterval(() => {
@@ -117,6 +121,7 @@
                     const fadeBeforeEnd = t.settings.crossfadeDuration || 2;
                     if (duration && currentTime >= duration - fadeBeforeEnd) {
                         t._fadeStarted = true;
+                        t.preloadNextSong();
                         t.playNextSong();
                     }
                 }, 200);
@@ -252,18 +257,32 @@
             this.initMediaAPIActions(),
             this.setCurrentSong(0)) : console.error("There are no songs in the player.")
 
-            if (isIOS) {
-                 // --- Attach iOS unlock on first user gesture ---
-                document.addEventListener("touchstart", () => {
-                    if (!this._iosUnlocked) this.unlockAudioContext();
+            document.addEventListener("touchstart", () => {
+                     audioContext.resume(), { once: true };
+                   // if (!this._iosUnlocked) this.unlockAudioContext();
                 }, { once: true });
                 
-                document.addEventListener("click", () => {
-                   if (!this._iosUnlocked) this.unlockAudioContext();
+            document.addEventListener("click", () => {
+                    let playhead = audioContext.currentTime;
+                  // if (!this._iosUnlocked) this.unlockAudioContext();
                 }, { once: true });
-            }
            
         },
+        
+        preloadNextSong() {
+            const song = this.getNextSong();
+            const player = this;
+            if (!song || song.audioBuffer) return; // already preloaded
+        
+            fetch(song.audio.currentSrc)
+                .then(res => res.arrayBuffer())
+                .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                .then(buffer => {
+                    song.audioBuffer = buffer;
+                })
+                .catch(err => console.warn("Failed to preload song:", err));
+        },
+        
         getVolume: function() {
             return this._volume
         },
@@ -337,7 +356,6 @@
         unlockAudioContext: function() {
             const firstSong = this.songs && this.songs[0];
             const ctx = firstSong.getAudioContext();
-        
         
             // Prime all tracks silently
             this.songs.forEach(song => {
@@ -501,10 +519,12 @@
             try { 
                  // Create or reuse source nodes
                 if (!currentSong.sourceNode)
-                    currentSong.sourceNode = context.createMediaElementSource(currentSong.audio);
-            
+                    currentSong.sourceNode = context.createBufferSource();
+                    currentSong.sourceNode.buffer = currentSong.audioBuffer;
+                
                 if (!nextSong.sourceNode)
-                    nextSong.sourceNode = context.createMediaElementSource(nextSong.audio);
+                    nextSong.sourceNode =  context.createBufferSource();
+                    nextSong.sourceNode.buffer = nextSong.audioBuffer;
             
                 // Create gain nodes for each track (store them so we can reuse)
                 if (!currentSong.gainNode) {
@@ -528,7 +548,8 @@
             // Prepare and play next song
             nextSong.audio.currentTime = 0;
             nextSong.audio.volume = this.getVolume();
-            nextSong.audio.play().catch(err => console.warn("Playback blocked", err));
+            nextSong.sourceNode.start(0);
+         //   nextSong.audio.play().catch(err => console.warn("Playback blocked", err));
             
             // Fade between
          //   currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, context. fadeTime);
