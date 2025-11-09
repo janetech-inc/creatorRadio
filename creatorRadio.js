@@ -320,7 +320,7 @@
             this.getCurrentSong().audio.volume = this.getVolume(),
             e.truePlayerManager.activePlayer = this,
            // this.getCurrentSong().audio.play().catch(err => console.warn("Playback blocked", err));
-            this.settings.crossfadeDuration = this.fadeType( this.getCurrentSong().type, this.getNextSong().type);
+            this.settings.crossfadeDuration = this.fadeTime( this.getCurrentSong().type, this.getNextSong().type);
             this.preloadPlayCurrentSong(this.settings.crossfadeDuration);
         },
         stopCurrentSong: function() {
