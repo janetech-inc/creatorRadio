@@ -554,10 +554,10 @@
         },
 
         stopSong: function(song) {
-          if (song.sourceNode) {
-                song.sourceNode.stop(audioContext.currentTime);
-                song.sourceNode.disconnect();                
-                song.sourceNode = null;                
+          if (song._bufferSource) {
+                song._bufferSource.stop(audioContext.currentTime);
+                song._bufferSource.disconnect();                
+                song._bufferSource = null;                
           }
 
         },
