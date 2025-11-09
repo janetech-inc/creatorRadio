@@ -119,8 +119,7 @@
                 t._iosTimer = setInterval(() => {
 
                     if (t.isDragging) return !1;
-                    const currentTime = (audioContext.currentTime - t.getCurrentSong().startTime) ;
-
+                  
                     const currentTime = Math.min(
                         audioContext.currentTime - t.getCurrentSong().startTime,
                         t.getCurrentSong().audio.duration
