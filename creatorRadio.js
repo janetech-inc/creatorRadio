@@ -119,12 +119,13 @@
                 t._iosTimer = setInterval(() => {
 
                     if (t.isDragging) return !1;
-                    var n = t.getCurrentSong().audio.currentTime
+                    const currentTime = (audioContext.currentTime - t.getCurrentSong().startTime) ;
+                    var n = currentTime
                       , i = t.getCurrentSong().audio.duration;
                     t.updateSongDisplayTime(n, i)
                             
                     const duration = this.duration;
-                    const currentTime = (audioContext.currentTime - this.startTime) ;
+        
                     const fadeBeforeEnd = t.settings.crossfadeDuration || 2;
                     if (duration && currentTime >= duration - fadeBeforeEnd) {
                         if (this.paused || t._fadeStarted) return;
