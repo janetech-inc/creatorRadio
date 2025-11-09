@@ -338,6 +338,7 @@
         stopCurrentSong: function() {
             this.pauseCurrentSong(),
             this.stopSong(this.getCurrentSong()),
+            this.stopSong(this.getNextSong()),
             this.getCurrentSong().audio.currentTime = 0
         },
         pauseCurrentSong: function() {
@@ -346,6 +347,7 @@
             e.truePlayerManager.activePlayer == this && (e.truePlayerManager.activePlayer = null,
             e.truePlayerManager.previouslyActivePlayer = this),
             this.stopSong(this.getCurrentSong()),
+            this.stopSong(this.getNextSong()),
             this.getCurrentSong().audio.pause()
         },
         togglePauseCurrentSong: function() {
