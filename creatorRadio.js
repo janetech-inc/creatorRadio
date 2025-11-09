@@ -529,13 +529,13 @@
             source.buffer = song.audioBuffer;
             source.connect(gainNode);
             gainNode.connect(ctx.destination);
-
             gainNode.gain.setValueAtTime(0, ctx.currentTime);
-            this.fadeIn(song.type, song, ctx.currentTime, fadeTime);
-            source.start(ctx.currentTime);
 
             song._bufferSource = source;
             song.gainNode = gainNode;
+
+            this.fadeIn(song.type, song, ctx.currentTime, fadeTime);
+            source.start(ctx.currentTime);
         },
         playNextSong: function() {
            if (this.songs.length <= 1) return false;
