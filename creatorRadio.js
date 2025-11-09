@@ -541,9 +541,9 @@
             song._bufferSource = source;
             song.gainNode = gainNode;
             song.startTime = ctx.currentTime; 
-
-            this.fadeIn(song.type, song, ctx.currentTime, fadeTime);
             source.start(ctx.currentTime);
+            this.fadeIn(song.type, song, ctx.currentTime, fadeTime);
+
         },
         playNextSong: function() {
            if (this.songs.length <= 1) return false;
