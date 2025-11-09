@@ -345,6 +345,7 @@
             this.playButton.show(),
             e.truePlayerManager.activePlayer == this && (e.truePlayerManager.activePlayer = null,
             e.truePlayerManager.previouslyActivePlayer = this),
+            this.stopSong(this.getCurrentSong()),
             this.getCurrentSong().audio.pause()
         },
         togglePauseCurrentSong: function() {
