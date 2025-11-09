@@ -127,7 +127,7 @@
                     const duration = this.duration;
         
                     const fadeBeforeEnd = t.settings.crossfadeDuration || 2;
-                    if (duration && currentTime >= duration - fadeBeforeEnd) {
+                    if (duration && currentTime >= (t.getCurrentSong().startTime + duration - fadeBeforeEnd)) {
                         if (this.paused || t._fadeStarted) return;
                         t._fadeStarted = true;
                         t.playNextSong();
