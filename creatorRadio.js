@@ -519,12 +519,16 @@
             try { 
                  // Create or reuse source nodes
                 if (!currentSong.sourceNode)
+                {
                     currentSong.sourceNode = context.createBufferSource();
                     currentSong.sourceNode.buffer = currentSong.audioBuffer;
+                }
                 
-                if (!nextSong.sourceNode)
+                if (!nextSong.sourceNode) {
+                    
                     nextSong.sourceNode =  context.createBufferSource();
                     nextSong.sourceNode.buffer = nextSong.audioBuffer;
+                }
             
                 // Create gain nodes for each track (store them so we can reuse)
                 if (!currentSong.gainNode) {
