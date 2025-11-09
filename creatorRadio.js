@@ -113,15 +113,21 @@
                 };
             }
             
-            if (isIOS) {
+            
+            if (true) {
                 clearInterval(t._iosTimer);
                 t._iosTimer = setInterval(() => {
-                    if (this.paused || t._fadeStarted) return;
-        
+
+                    if (t.isDragging) return !1;
+                    var n = t.getCurrentSong().audio.currentTime
+                      , i = t.getCurrentSong().audio.duration;
+                    t.updateSongDisplayTime(n, i)
+                            
                     const duration = this.duration;
                     const currentTime = this.currentTime;
                     const fadeBeforeEnd = t.settings.crossfadeDuration || 2;
                     if (duration && currentTime >= duration - fadeBeforeEnd) {
+                        if (this.paused || t._fadeStarted) return;
                         t._fadeStarted = true;
                         t.playNextSong();
                     } else {
@@ -275,7 +281,7 @@
         preloadPlayCurrentSong(fadeTime) {
             const song = this.getCurrentSong();
             const player = this;
-            if (!song || song.audioBuffer) return; // already preloaded
+            if (!song || song.audioBuffer) player.playSong(song, 0); // already preloaded
         
             fetch(song.audio.currentSrc)
                 .then(res => res.arrayBuffer())
@@ -586,7 +592,6 @@
          //   nextSong.gainNode.gain.setValueAtTime(0, context.currentTime);
         
             // Prepare and play next song
-            this.playSong(nextSong, fadeTime);
         //    nextSong.audio.currentTime = 0;
           //  nextSong.audio.volume = this.getVolume();
           //  nextSong.sourceNode.start(context.currentTime);
@@ -596,8 +601,8 @@
          //   currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, context. fadeTime);
            // nextSong.gainNode.gain.linearRampToValueAtTime(1, context.currentTime + fadeTime);
             this.fadeOut(currentSong.type, currentSong, context.currentTime, fadeTime);
-        
-        
+            this.playSong(nextSong, fadeTime);
+            
             // Stop old track after fade completes
             setTimeout(() => {
                 currentSong.audio.pause();
