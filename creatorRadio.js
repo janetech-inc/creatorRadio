@@ -337,6 +337,7 @@
         },
         stopCurrentSong: function() {
             this.pauseCurrentSong(),
+            this.stopSong(this.getCurrentSong()),
             this.getCurrentSong().audio.currentTime = 0
         },
         pauseCurrentSong: function() {
@@ -548,6 +549,15 @@
             song.startTime = ctx.currentTime; 
             source.start(ctx.currentTime);
             this.fadeIn(song.type, song, ctx.currentTime, fadeTime);
+
+        },
+
+        stopSong: function(song) {
+          if (song.sourceNode) {
+                song.sourceNode.stop(audioContext.currentTime);
+                song.sourceNode.disconnect();                
+                song.sourceNode = null;                
+          }
 
         },
         playNextSong: function() {
