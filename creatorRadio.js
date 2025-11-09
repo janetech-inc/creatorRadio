@@ -348,7 +348,7 @@
             e.truePlayerManager.previouslyActivePlayer = this),
             this.stopSong(this.getCurrentSong()),
             this.stopSong(this.getNextSong()),
-            this.getCurrentSong().audio.pause()
+           // this.getCurrentSong().audio.pause()
         },
         togglePauseCurrentSong: function() {
             "playing" == this.getPlayerState() ? this.pauseCurrentSong() : this.playCurrentSong()
@@ -538,6 +538,8 @@
         }, 
         playSong: function(song, fadeTime = 2) {
             if (!song.audioBuffer) return song.audio.play(); // fallback
+
+            this.stopSong(song);
 
             const ctx = audioContext;
             const source = ctx.createBufferSource();
