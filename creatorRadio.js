@@ -309,12 +309,12 @@
                 // Cascade down
                 if ( depth < 3) {
                     index = this.getCurrentSongIndex();
-                    let nextSong = getSongAt(index + 2);
+                    let nextSong = this.getSongAt(index + 2);
                     if (!nextSong.audioBuffer) {
-                         return preloadSong(song, depth + 1);
+                         return this.preloadSong(song, depth + 1);
                     } else {
-                        nextSong = getSongAt(index + 3)
-                        return preloadSong(song, depth + 1);
+                        nextSong = this.getSongAt(index + 3)
+                        return this.preloadSong(song, depth + 1);
                     }
            
                 } else { return; }
