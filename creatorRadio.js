@@ -79,7 +79,7 @@
                 t.playNextSong();
             }
              else {
-                        t.preloadNextSong();
+                        t.preloadSong();
                     }
         }),
         this.audio.addEventListener("volumechange", function(e) {
@@ -135,7 +135,7 @@
                         t._fadeStarted = true;
                         t.playNextSong();
                     } else {
-                        t.preloadNextSong();
+                        t.preloadSong(t.getNextSong(),0);
                     }
                 }, 200);
             }
@@ -311,10 +311,10 @@
                     index = this.getCurrentSongIndex();
                     let nextSong = getSongAt(index + 2);
                     if (!nextSong.audioBuffer) {
-                         return preloadNextSong(song, true, depth + 1);
+                         return preloadSong(song, depth + 1);
                     } else {
                         nextSong = getSongAt(index + 3)
-                        return preloadNextSong(song, true, depth + 1);
+                        return preloadSong(song, depth + 1);
                     }
            
                 } else { return; }
