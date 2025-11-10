@@ -379,14 +379,14 @@
             "playing" == this.getPlayerState() ? this.stopCurrentSong() : this.playCurrentSong()
         },
         getCurrentSong: function() {
-            return this.getSongAt(this.getCurrentSongIndex())
+            return this.getSongAt(this.getCurrentSongIndex());
         },
         getNextSong: function() {
-            return this.getSongAt(this.getCurrentSongIndex() + 1)
+            return this.getSongAt(this.getCurrentSongIndex() + 1);
         },
         getSongAt: function(index) {
-            index = this.songs[index] ? index : 0,
-            this.songs[index]
+            index = this.songs[index] ? index : 0;
+            return this.songs[index];
         },
         setCurrentSong: function(t, l) {
             var e = this.songs[t];
