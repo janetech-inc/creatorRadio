@@ -386,7 +386,7 @@
         },
         getSongAt: function(index) {
             index = this.songs[index] ? index : 0,
-            return this.songs[index]
+            this.songs[index]
         },
         setCurrentSong: function(t, l) {
             var e = this.songs[t];
