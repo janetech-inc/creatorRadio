@@ -330,9 +330,9 @@
                     song.preloading = false;
                 })
                 .catch(err => {
-                    console.warn("Failed to preload song:", err));
+                    console.warn("Failed to preload song:", err);
                     song.preloading = false;
-                }
+                })
         },
         
         getVolume: function() {
