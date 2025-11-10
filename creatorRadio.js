@@ -118,7 +118,7 @@
                 clearInterval(t._iosTimer);
                 t._iosTimer = setInterval(() => {
 
-                    if (t.isDragging) return !1;
+                    if (t.isDragging || t.getPlayerState() == "paused") return !1;
                   
                     const currentTime = Math.min(
                         audioContext.currentTime - t.getCurrentSong().startTime,
@@ -299,18 +299,40 @@
                 .catch(err => console.warn("Failed to preload song:", err));
         },
         
-        preloadNextSong() {
-            const song = this.getNextSong();
+        preloadSong(song, depth=0) {
+           // const song = this.getNextSong();
             const player = this;
-            if (!song || song.audioBuffer) return; // already preloaded
+            if (!song || song.preloading) return; // already preloading
+
+            // Already loaded
+            if (song.audioBuffer) {
+                // Cascade down
+                if ( depth < 3) {
+                    index = this.getCurrentSongIndex();
+                    let nextSong = getSongAt(index + 2);
+                    if (!nextSong.audioBuffer) {
+                         return preloadNextSong(song, true, depth + 1);
+                    } else {
+                        nextSong = getSongAt(index + 3)
+                        return preloadNextSong(song, true, depth + 1);
+                    }
+           
+                } else { return; }
+            } 
+            
+            song.preloading = true;
         
             fetch(song.audio.currentSrc)
                 .then(res => res.arrayBuffer())
                 .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
                 .then(buffer => {
                     song.audioBuffer = buffer;
+                    song.preloading = false;
                 })
-                .catch(err => console.warn("Failed to preload song:", err));
+                .catch(err => {
+                    console.warn("Failed to preload song:", err));
+                    song.preloading = false;
+                }
         },
         
         getVolume: function() {
@@ -358,12 +380,14 @@
         },
         getCurrentSong: function() {
             return -1 === this.getCurrentSongIndex() && this.setCurrentSong(0, false),
-            this.songs[this.getCurrentSongIndex()]
+            this.getSongAt(this.getCurrentSongIndex())
         },
         getNextSong: function() {
-            const currentIndex = this.getCurrentSongIndex();
-            const nextIndex = this.songs[currentIndex + 1] ? currentIndex + 1 : 0;
-            return this.songs[nextIndex];
+            this.getSongAt(this.getCurrentSongIndex() + 1)
+        },
+        getSongAt: function(index) {
+            index = this.songs[index] ? index : 0,
+            this.songs[index]
         },
         setCurrentSong: function(t, l) {
             var e = this.songs[t];
@@ -537,7 +561,7 @@
           }
         }, 
         playSong: function(song, fadeTime = 2) {
-            if (!song.audioBuffer) return song.audio.play(); // fallback
+           // if (!song.audioBuffer) return song.audio.play(); // fallback
 
             this.stopSong(song);
 
