@@ -274,11 +274,6 @@
                      audioContext.resume(), { once: true };
                    // if (!this._iosUnlocked) this.unlockAudioContext();
                 }, { once: true });
-                
-            document.addEventListener("click", () => {
-                    let playhead = audioContext.currentTime;
-                  // if (!this._iosUnlocked) this.unlockAudioContext();
-                }, { once: true });
            
         },
 
@@ -293,8 +288,6 @@
                 .then(buffer => {
                     song.audioBuffer = buffer;
                     player.playSong(song, 0);
-                    const playEvent = new Event('play', { bubbles: true, cancelable: true })
-                    song.audio.dispatchEvent(playEvent);
                 })
                 .catch(err => console.warn("Failed to preload song:", err));
         },
@@ -577,6 +570,9 @@
             song.startTime = ctx.currentTime; 
             source.start(ctx.currentTime);
             this.fadeIn(song.type, song, ctx.currentTime, fadeTime);
+
+            const playEvent = new Event('play', { bubbles: true, cancelable: true })
+            song.audio.dispatchEvent(playEvent);
 
         },
 
