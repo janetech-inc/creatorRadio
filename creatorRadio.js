@@ -280,14 +280,14 @@
         preloadPlayCurrentSong(fadeTime) {
             const song = this.getCurrentSong();
             const player = this;
-            if (!song || song.audioBuffer) player.playSong(song, 0); // already preloaded
+            if (!song || song.audioBuffer) player.playSong(song, 0, 0); // already preloaded
         
             fetch(song.audio.currentSrc)
                 .then(res => res.arrayBuffer())
                 .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
                 .then(buffer => {
                     song.audioBuffer = buffer;
-                    player.playSong(song, 0);
+                    player.playSong(song, 0, 0);
                 })
                 .catch(err => console.warn("Failed to preload song:", err));
         },
@@ -436,7 +436,7 @@
                 t(e).one("touchend", function() {
                     t(e).off("touchmove.trueAudioPlayer"),
                    // n.getCurrentSong().audio.currentTime = n.tempCurrentTime,
-                    this.playFrom(n.tempCurrentTime);
+                    this.playSong(song, 0, n.tempCurrentTime);
                     n.isDragging = !1
                 })
             }),
@@ -455,7 +455,7 @@
                 t(e).one("mouseup", function() {
                     t(e).off("mousemove.trueAudioPlayer"),
                     //n.getCurrentSong().audio.currentTime = n.tempCurrentTime,
-                    this.playFrom(n.tempCurrentTime);
+                    this.playSong(song, 0, n.tempCurrentTime);
                     n.isDragging = !1
                 })
             })
@@ -641,7 +641,7 @@
          //   currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, context. fadeTime);
            // nextSong.gainNode.gain.linearRampToValueAtTime(1, context.currentTime + fadeTime);
             this.fadeOut(currentSong.type, currentSong, context.currentTime, fadeTime);
-            this.playSong(nextSong, fadeTime);
+            this.playSong(nextSong, fadeTime, 0);
             
             // Stop old track after fade completes
             setTimeout(() => {
