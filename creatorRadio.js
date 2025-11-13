@@ -454,7 +454,8 @@
                 }),
                 t(e).one("mouseup", function() {
                     t(e).off("mousemove.trueAudioPlayer"),
-                    n.getCurrentSong().audio.currentTime = n.tempCurrentTime,
+                    //n.getCurrentSong().audio.currentTime = n.tempCurrentTime,
+                    this.playFrom(n.tempCurrentTime);
                     n.isDragging = !1
                 })
             })
