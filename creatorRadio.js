@@ -293,7 +293,6 @@
         },
         
         preloadSong(song, depth=0) {
-           // const song = this.getNextSong();
             const player = this;
             if (!song || song.preloading) return; // already preloading
 
@@ -436,7 +435,8 @@
                 }),
                 t(e).one("touchend", function() {
                     t(e).off("touchmove.trueAudioPlayer"),
-                    n.getCurrentSong().audio.currentTime = n.tempCurrentTime,
+                   // n.getCurrentSong().audio.currentTime = n.tempCurrentTime,
+                    this.playFrom(n.tempCurrentTime);
                     n.isDragging = !1
                 })
             }),
@@ -552,9 +552,7 @@
                return this.settings.fadeTime;
           }
         }, 
-        playSong: function(song, fadeTime = 2) {
-           // if (!song.audioBuffer) return song.audio.play(); // fallback
-
+        playSong: function(song, fadeTime = 2, offset = 0) {
             this.stopSong(song);
 
             const ctx = audioContext;
@@ -568,7 +566,7 @@
             song._bufferSource = source;
             song.gainNode = gainNode;
             song.startTime = ctx.currentTime; 
-            source.start(ctx.currentTime);
+            source.start(ctx.currentTime, offset);
             this.fadeIn(song.type, song, ctx.currentTime, fadeTime);
 
             const playEvent = new Event('play', { bubbles: true, cancelable: true })
@@ -578,7 +576,7 @@
 
         stopSong: function(song) {
           if (song._bufferSource) {
-                song._bufferSource.stop(audioContext.currentTime);
+                song._bufferSource.stop();
                 song._bufferSource.disconnect();                
                 song._bufferSource = null;                
           }
