@@ -436,7 +436,7 @@
                 t(e).one("touchend", function() {
                     t(e).off("touchmove.trueAudioPlayer"),
                    // n.getCurrentSong().audio.currentTime = n.tempCurrentTime,
-                    this.playSong(n.getCurrentSong(), 0, n.tempCurrentTime);
+                    n.playSong(n.getCurrentSong(), 0, n.tempCurrentTime);
                     n.isDragging = !1
                 })
             }),
@@ -455,7 +455,7 @@
                 t(e).one("mouseup", function() {
                     t(e).off("mousemove.trueAudioPlayer"),
                     //n.getCurrentSong().audio.currentTime = n.tempCurrentTime,
-                    this.playSong(n.getCurrentSong(), 0, n.tempCurrentTime);
+                    n.playSong(n.getCurrentSong(), 0, n.tempCurrentTime);
                     n.isDragging = !1
                 })
             })
