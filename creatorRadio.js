@@ -356,6 +356,7 @@
             this.getCurrentSong().audio.currentTime = 0
         },
         pauseCurrentSong: function() {
+            
             this.pauseButton.hide(),
             this.playButton.show(),
             e.truePlayerManager.activePlayer == this && (e.truePlayerManager.activePlayer = null,
