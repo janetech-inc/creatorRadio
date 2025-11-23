@@ -345,7 +345,6 @@
             this.playButton.hide(),
             this.getCurrentSong().audio.volume = this.getVolume(),
             e.truePlayerManager.activePlayer = this,
-           // this.getCurrentSong().audio.play().catch(err => console.warn("Playback blocked", err));
             this.settings.crossfadeDuration = this.fadeTime( this.getCurrentSong().type, this.getNextSong().type);
             this.preloadPlayCurrentSong(this.settings.crossfadeDuration);
         },
@@ -384,11 +383,6 @@
         setCurrentSong: function(t, l) {
             var e = this.songs[t];
             if (!e) return console.error("Song with index " + t + " not found."), !1;
-
-            if(l) {   
-             //   e.preload = "metadata";
-                //e.audio.load();     
-            }
    
             var n = this.songs[this._currentSongIndex];
             n && n.$parentElem && n.targetSetId != e.targetSetId && (n.$parentElem.removeClass("is-current"),
@@ -403,22 +397,6 @@
             this.$artistName.text(e.artist),
             this.$duration.text(e.durationString),
             this.$genre.text(e.genre)
-        },
-        unlockAudioContext: function() {
-            const firstSong = this.songs && this.songs[0];
-            const ctx = firstSong.getAudioContext();
-        
-            // Prime all tracks silently
-            this.songs.forEach(song => {
-                try {
-                    song.audio.volume = 0;
-                    song.audio.play().catch(err => console.warn("Playback blocked", err));
-                    song.audio.pause();
-                    song.audio.volume = this.getVolume();
-                } catch(e) {}
-            });
-            this._iosUnlocked = true;
-            console.log("✅ iOS audio unlocked");
         },
         initProgressBarEvents: function() {
             var n = this;
@@ -499,47 +477,146 @@
               , i = (e - this.$volumeBarWrapper.offset().left) / n;
             this.setVolume(i)
         },  
+
+        // utility to safely extract a label for the song (optional)
+        function getSongLabel(song) {
+            if (!song) return 'unknown-track';
+            
+              const name =
+                song.name ||
+                song.id 
+                'unknown-track';
+            
+              // try to pull duration from common fields
+              const duration =
+                song.audio?.duration ||
+                song._audioBuffer?.duration ||
+                null;
+            
+              return duration
+                ? `${name} (duration: ${duration.toFixed?.(2) ?? duration}s)`
+                : name;
+        }
+        
+        // simple logger you can later swap with a backend call
+        function logFadeEvent(direction, details) {
+          // You can change this to send to your server instead of console
+          console.log(`[${direction.toUpperCase()}]`, {
+            ts: performance.now(), // or Date.now()
+            ...details,
+          });
+        }
+        
         fadeIn(type, song, startTime, fadeDuration) {
+
           if(!song.gainNode) {
+                logFadeEvent('fadeIn', {
+                  warning: 'Missing gainNode',
+                  type,
+                  song: getSongLabel(song),
+                  startTime,
+                  fadeDuration,
+                });
+              
               return;
           }
+
           const g = song.gainNode.gain;
+          const beforeValue = g.value;
+
+          let rampType = null;
+          let targetValue = null;
+          let endTime = null;
+            
           g.cancelScheduledValues(startTime);
           g.setValueAtTime(0.001, startTime);
         
           switch (type) {
             case 'liner':
             case 'show':
-              g.exponentialRampToValueAtTime(1, startTime + 0.0001);
+            rampType = 'exponential';
+              targetValue = 1;
+              endTime = startTime + 0.0001;
+              g.exponentialRampToValueAtTime(targetValue, endTime);
               break;
             case 'music':
             case 'promo':
             default:
-              g.linearRampToValueAtTime(1, startTime + fadeDuration);
+              rampType = 'linear';
+              targetValue = 1;
+              endTime = startTime + fadeDuration;
+              g.linearRampToValueAtTime(targetValue, endTime);
           }
+
+        logFadeEvent('fadeIn', {
+            type,
+            song: getSongLabel(song),
+            startTime,
+            fadeDuration,
+            rampType,
+            targetValue,
+            endTime,
+            beforeValue,
+            afterSetValueAtTime: 0.001,
+          });
+            
         },
 
         fadeOut(type, song, startTime, fadeDuration) {
-
-          if(!song.gainNode) {
+            if(!song.gainNode) {
+                logFadeEvent('fadeOut', {
+                  warning: 'Missing gainNode',
+                  type,
+                  song: getSongLabel(song),
+                  startTime,
+                  fadeDuration,
+                });
+              
               return;
           }
+
           const g = song.gainNode.gain;
+          const beforeValue = g.value;
+          let rampType = null;
+          let targetValue = null;
+          let endTime = null;
+    
           g.cancelScheduledValues(startTime);
           g.setValueAtTime(g.value, startTime);
         
           switch (type) {
             case 'music':
-              g.exponentialRampToValueAtTime(0.001, startTime + fadeDuration);
+              rampType = 'exponential';
+              targetValue = 0.001;
+              endTime = startTime + fadeDuration;
+              g.exponentialRampToValueAtTime(targetValue, endTime;
               break;
             case 'liner':
             case 'show':
-                g.exponentialRampToValueAtTime(1, startTime + 0.0001);
+                rampType = 'exponential';
+                targetValue = 1;
+                endTime = startTime + 0.0001;
+                g.exponentialRampToValueAtTime(targetValue, endTime);
                 break;
             case 'promo':
             default:
+              rampType = 'linear';
+              targetValue = 0;
+              endTime = startTime + fadeDuration;
               g.linearRampToValueAtTime(0, startTime + fadeDuration);
           }
+
+          logFadeEvent('fadeOut', {
+            type,
+            song: getSongLabel(song),
+            startTime,
+            fadeDuration,
+            rampType,
+            targetValue,
+            endTime,
+            beforeValue,
+            afterSetValueAtTime: beforeValue,
+          });
         }, 
 
         fadeTime(outType, inType) {
