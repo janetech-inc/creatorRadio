@@ -500,6 +500,9 @@
             this.setVolume(i)
         },  
         fadeIn(type, song, startTime, fadeDuration) {
+          if(!song.gainNode) {
+              return;
+          }
           const g = song.gainNode.gain;
           g.cancelScheduledValues(startTime);
           g.setValueAtTime(0.001, startTime);
@@ -517,6 +520,10 @@
         },
 
         fadeOut(type, song, startTime, fadeDuration) {
+
+          if(!song.gainNode) {
+              return;
+          }
           const g = song.gainNode.gain;
           g.cancelScheduledValues(startTime);
           g.setValueAtTime(g.value, startTime);
