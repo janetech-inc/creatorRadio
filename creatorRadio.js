@@ -589,7 +589,7 @@
               rampType = 'exponential';
               targetValue = 0.001;
               endTime = startTime + fadeDuration;
-              g.exponentialRampToValueAtTime(targetValue, endTime;
+              g.exponentialRampToValueAtTime(targetValue, endTime);
               break;
             case 'liner':
             case 'show':
