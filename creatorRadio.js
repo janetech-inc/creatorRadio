@@ -121,9 +121,9 @@
                     if (t.isDragging || t.getPlayerState() == "paused") return !1;
                   
                     const currentTime = Math.min(
-                        audioContext.currentTime - t.getCurrentSong().startTime,
+                        audioContext.currentTime - t.getCurrentSong().startTime + t.tempCurrentTime,
                         t.getCurrentSong().audio.duration
-                    ) + t.tempCurrentTime;
+                    );
                     
                     var n = currentTime
                       , i = t.getCurrentSong().audio.duration;
