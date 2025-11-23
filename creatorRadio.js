@@ -76,7 +76,7 @@
             const fadeBeforeEnd = t.settings.crossfadeDuration || 2;
             if (i && n >= i - fadeBeforeEnd && !t._fadeStarted) {
                 t._fadeStarted = true;
-                t.playNextSong();
+                t.playNextSong(false);
             }
              else {
                         t.preloadSong();
@@ -133,7 +133,7 @@
                     if (currentTime >= t.getCurrentSong().audio.duration - fadeBeforeEnd) {
                         if (t._fadeStarted) return;
                         t._fadeStarted = true;
-                        t.playNextSong();
+                        t.playNextSong(false);
                     } else {
                         t.preloadSong(t.getNextSong(),0);
                     }
@@ -242,7 +242,7 @@
                 e.getVolume() > 0 ? e.setVolume(0) : e.setVolume(1)
             }),
             this.nextButton.on("click", function() {
-                e.playNextSong()
+                e.playNextSong(true)
             }),
             this.previousButton.on("click", function() {
                 e.playPreviousSong()
@@ -592,7 +592,7 @@
           }
 
         },
-        playNextSong: function() {
+        playNextSong: function(skip=false) {
            if (this.songs.length <= 1) return false;
             const currentSong = this.getCurrentSong();
             const currentIndex = this.getCurrentSongIndex();
@@ -649,13 +649,17 @@
             // Fade between
          //   currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, context. fadeTime);
            // nextSong.gainNode.gain.linearRampToValueAtTime(1, context.currentTime + fadeTime);
-            this.fadeOut(currentSong.type, currentSong, context.currentTime, fadeTime);
+            if(skip) {
+                this.stopSong(currentSong);
+            } else {
+                this.fadeOut(currentSong.type, currentSong, context.currentTime, fadeTime);
+            }
+
             this.playSong(nextSong, fadeTime, 0, true);
             
             // Stop old track after fade completes
             setTimeout(() => {
-                currentSong.audio.pause();
-                currentSong.audio.currentTime = 0;
+                this.stopSong(currentSong);
                 this.setCurrentSong(nextIndex, false);
                 this.setPlayerState("playing", nextSong);
                 this._isCrossfading = false;
@@ -866,7 +870,7 @@
                 t.playPreviousSong()
             }
             ], ["nexttrack", function() {
-                t.playNextSong()
+                t.playNextSong(true)
             }
             ], ["stop", function() {
                 t.stopCurrentSong()
