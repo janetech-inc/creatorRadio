@@ -499,7 +499,7 @@
         },
         
         // simple logger you can later swap with a backend call
-        logFadeEvent(direction, details) {
+        this.logFadeEvent(direction, details) {
           // You can change this to send to your server instead of console
           console.log(`[${direction.toUpperCase()}]`, {
             ts: performance.now(), // or Date.now()
@@ -510,7 +510,7 @@
         fadeIn(type, song, startTime, fadeDuration) {
 
           if(!song.gainNode) {
-                logFadeEvent('fadeIn', {
+                this.logFadeEvent('fadeIn', {
                   warning: 'Missing gainNode',
                   type,
                   song: getSongLabel(song),
@@ -548,7 +548,7 @@
               g.linearRampToValueAtTime(targetValue, endTime);
           }
 
-        logFadeEvent('fadeIn', {
+        this.logFadeEvent('fadeIn', {
             type,
             song: getSongLabel(song),
             startTime,
@@ -564,7 +564,7 @@
 
         fadeOut(type, song, startTime, fadeDuration) {
             if(!song.gainNode) {
-                logFadeEvent('fadeOut', {
+                this.logFadeEvent('fadeOut', {
                   warning: 'Missing gainNode',
                   type,
                   song: getSongLabel(song),
@@ -606,7 +606,7 @@
               g.linearRampToValueAtTime(0, startTime + fadeDuration);
           }
 
-          logFadeEvent('fadeOut', {
+          this.logFadeEvent('fadeOut', {
             type,
             song: getSongLabel(song),
             startTime,
