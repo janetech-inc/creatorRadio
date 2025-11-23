@@ -479,7 +479,7 @@
         },  
 
         // utility to safely extract a label for the song (optional)
-        function getSongLabel(song) {
+        getSongLabel(song) {
             if (!song) return 'unknown-track';
             
               const name =
@@ -496,16 +496,16 @@
               return duration
                 ? `${name} (duration: ${duration.toFixed?.(2) ?? duration}s)`
                 : name;
-        }
+        },
         
         // simple logger you can later swap with a backend call
-        function logFadeEvent(direction, details) {
+        logFadeEvent(direction, details) {
           // You can change this to send to your server instead of console
           console.log(`[${direction.toUpperCase()}]`, {
             ts: performance.now(), // or Date.now()
             ...details,
           });
-        }
+        },
         
         fadeIn(type, song, startTime, fadeDuration) {
 
