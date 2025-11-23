@@ -123,7 +123,7 @@
                     const currentTime = Math.min(
                         audioContext.currentTime - t.getCurrentSong().startTime,
                         t.getCurrentSong().audio.duration
-                    );
+                    ) + t.tempCurrentTime;
                     
                     var n = currentTime
                       , i = t.getCurrentSong().audio.duration;
@@ -280,14 +280,14 @@
         preloadPlayCurrentSong(fadeTime) {
             const song = this.getCurrentSong();
             const player = this;
-            if (!song || song.audioBuffer) player.playSong(song, 0, 0); // already preloaded
+            if (!song || song.audioBuffer) player.playSong(song, 0, 0, true); // already preloaded
         
             fetch(song.audio.currentSrc)
                 .then(res => res.arrayBuffer())
                 .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
                 .then(buffer => {
                     song.audioBuffer = buffer;
-                    player.playSong(song, 0, 0);
+                    player.playSong(song, 0, 0, true);
                 })
                 .catch(err => console.warn("Failed to preload song:", err));
         },
@@ -437,7 +437,7 @@
                 t(e).one("touchend", function() {
                     t(e).off("touchmove.trueAudioPlayer"),
                    // n.getCurrentSong().audio.currentTime = n.tempCurrentTime,
-                    n.scrubToOffset(n.getCurrentSong(), n.tempCurrentTime);
+                    n.playSong(n.getCurrentSong(), 0, n.tempCurrentTime, false);
                     n.isDragging = !1
                 })
             }),
@@ -456,7 +456,7 @@
                 t(e).one("mouseup", function() {
                     t(e).off("mousemove.trueAudioPlayer"),
                     //n.getCurrentSong().audio.currentTime = n.tempCurrentTime,
-                    n.scrubToOffset(n.getCurrentSong(), n.tempCurrentTime);
+                    n.playSong(n.getCurrentSong(), 0, n.tempCurrentTime, false);
                     n.isDragging = !1
                 })
             })
@@ -561,7 +561,8 @@
                return this.settings.fadeTime;
           }
         }, 
-        playSong: function(song, fadeTime = 2, offset = 0) {
+        playSong: function(song, fadeTime = 2, offset = 0, dispatch=false) {
+
             this.stopSong(song);
             const ctx = audioContext;
             const source = ctx.createBufferSource();
@@ -577,8 +578,10 @@
             source.start(ctx.currentTime, offset);
             this.fadeIn(song.type, song, ctx.currentTime, fadeTime);
 
-            const playEvent = new Event('play', { bubbles: true, cancelable: true })
-            song.audio.dispatchEvent(playEvent);
+            if(dispatch) {
+                const playEvent = new Event('play', { bubbles: true, cancelable: true })
+                song.audio.dispatchEvent(playEvent);
+            }
         },
 
         stopSong: function(song) {
@@ -587,15 +590,7 @@
                 song._bufferSource.disconnect();                
                 song._bufferSource = null;                
           }
-        },
 
-        scrubToOffset: function(song, offset = 0) {
-
-           if(!song.gainNode) {
-              return;
-            }
-            const ctx = audioContext;
-            song._bufferSource.start(ctx.currentTime, offset);
         },
         playNextSong: function() {
            if (this.songs.length <= 1) return false;
