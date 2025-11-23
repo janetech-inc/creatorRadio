@@ -280,14 +280,14 @@
         preloadPlayCurrentSong(fadeTime) {
             const song = this.getCurrentSong();
             const player = this;
-            if (!song || song.audioBuffer) player.playSong(song, 0, 0, true); // already preloaded
+            if (!song || song.audioBuffer) player.playSong(song, 0, 0); // already preloaded
         
             fetch(song.audio.currentSrc)
                 .then(res => res.arrayBuffer())
                 .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
                 .then(buffer => {
                     song.audioBuffer = buffer;
-                    player.playSong(song, 0, 0, true);
+                    player.playSong(song, 0, 0);
                 })
                 .catch(err => console.warn("Failed to preload song:", err));
         },
@@ -437,7 +437,7 @@
                 t(e).one("touchend", function() {
                     t(e).off("touchmove.trueAudioPlayer"),
                    // n.getCurrentSong().audio.currentTime = n.tempCurrentTime,
-                    n.playSong(n.getCurrentSong(), 0, n.tempCurrentTime, false);
+                    n.scrubToOffset(n.getCurrentSong(), n.tempCurrentTime);
                     n.isDragging = !1
                 })
             }),
@@ -456,7 +456,7 @@
                 t(e).one("mouseup", function() {
                     t(e).off("mousemove.trueAudioPlayer"),
                     //n.getCurrentSong().audio.currentTime = n.tempCurrentTime,
-                    n.playSong(n.getCurrentSong(), 0, n.tempCurrentTime, false);
+                    n.scrubToOffset(n.getCurrentSong(), n.tempCurrentTime);
                     n.isDragging = !1
                 })
             })
@@ -561,12 +561,8 @@
                return this.settings.fadeTime;
           }
         }, 
-        playSong: function(song, fadeTime = 2, offset = 0, stop=false) {
-
-            if(stop) {
-                this.stopSong(song);
-            }
-
+        playSong: function(song, fadeTime = 2, offset = 0) {
+            this.stopSong(song);
             const ctx = audioContext;
             const source = ctx.createBufferSource();
             const gainNode = ctx.createGain();
@@ -581,10 +577,8 @@
             source.start(ctx.currentTime, offset);
             this.fadeIn(song.type, song, ctx.currentTime, fadeTime);
 
-            if(stop) {
-                const playEvent = new Event('play', { bubbles: true, cancelable: true })
-                song.audio.dispatchEvent(playEvent);
-            }
+            const playEvent = new Event('play', { bubbles: true, cancelable: true })
+            song.audio.dispatchEvent(playEvent);
         },
 
         stopSong: function(song) {
@@ -593,7 +587,15 @@
                 song._bufferSource.disconnect();                
                 song._bufferSource = null;                
           }
+        },
 
+        scrubToOffset: function(song, offset = 0) {
+
+           if(!song.gainNode) {
+              return;
+            }
+            const ctx = audioContext;
+            song._bufferSource.start(ctx.currentTime, offset);
         },
         playNextSong: function() {
            if (this.songs.length <= 1) return false;
