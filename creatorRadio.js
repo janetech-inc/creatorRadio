@@ -554,8 +554,11 @@
                return this.settings.fadeTime;
           }
         }, 
-        playSong: function(song, fadeTime = 2, offset = 0, dispatch=false) {
-            this.stopSong(song);
+        playSong: function(song, fadeTime = 2, offset = 0, stop=false) {
+
+            if(stop) {
+                this.stopSong(song);
+            }
 
             const ctx = audioContext;
             const source = ctx.createBufferSource();
@@ -571,7 +574,7 @@
             source.start(ctx.currentTime, offset);
             this.fadeIn(song.type, song, ctx.currentTime, fadeTime);
 
-            if(dispatch) {
+            if(stop) {
                 const playEvent = new Event('play', { bubbles: true, cancelable: true })
                 song.audio.dispatchEvent(playEvent);
             }
