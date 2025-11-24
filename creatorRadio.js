@@ -638,6 +638,14 @@
                return this.settings.fadeTime;
           }
         }, 
+        getSongEndTime(song) {
+          // when source.start(startAt, offset)
+          const startedAt = song.startTime || context.currentTime;      // audioContext.currentTime when started
+          const offset = song.offset || this.tempCurrentTime;            // seconds into the track (resume)
+          const duration = song.buffer?.duration || 0;
+        
+          return startedAt + (duration - offset);
+        },
         playSong: function(song, fadeTime = 2, offset = 0, dispatch=false) {
 
             this.stopSong(song,false);
@@ -651,9 +659,9 @@
 
             song._bufferSource = source;
             song.gainNode = gainNode;
-            song.startTime = ctx.currentTime; 
+            song.startTime = ctx.currentTime + offset; 
             source.start(ctx.currentTime, offset);
-            this.fadeIn(song.type, song, ctx.currentTime, fadeTime);
+            this.fadeIn(song.type, song, ctx.currentTime + offset, fadeTime);
 
             if(dispatch) {
                 const playEvent = new Event('play', { bubbles: true, cancelable: true })
@@ -689,54 +697,14 @@
     
             // Reuse a single AudioContext per crossfade
             const context = currentSong.getAudioContext();
-            
 
-          /*  try { 
-                 // Create or reuse source nodes
-                if (!currentSong.sourceNode)
-                {
-                //    currentSong.sourceNode = context.createBufferSource();
-                  //  currentSong.sourceNode.buffer = currentSong.audioBuffer;
-                }
-                
-                if (!nextSong.sourceNode) {
-                    
-                    nextSong.sourceNode =  context.createBufferSource();
-                    nextSong.sourceNode.buffer = nextSong.audioBuffer;
-                }
+            const endTime = this.getSongEndTime(currentSong);
+            const startTime = endTime - fadeDuration;
             
-                // Create gain nodes for each track (store them so we can reuse)
-                if (!currentSong.gainNode) {
-                //currentSong.gainNode = context.createGain();
-                  //  currentSong.sourceNode.connect(currentSong.gainNode).connect(context.destination);
-                }
-            
-                if (!nextSong.gainNode) {
-                    nextSong.gainNode = context.createGain();
-                    nextSong.sourceNode.connect(nextSong.gainNode).connect(context.destination);
-                }
-            }
-            catch (err) {
-                console.warn("MediaElementSource already exists:", err);
-            }*/
-
-            // Reset and start fade
-          //  currentSong.gainNode.gain.setValueAtTime(1, context.currentTime);
-         //   nextSong.gainNode.gain.setValueAtTime(0, context.currentTime);
-        
-            // Prepare and play next song
-        //    nextSong.audio.currentTime = 0;
-          //  nextSong.audio.volume = this.getVolume();
-          //  nextSong.sourceNode.start(context.currentTime);
-         //   nextSong.audio.play().catch(err => console.warn("Playback blocked", err));
-            
-            // Fade between
-         //   currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, context. fadeTime);
-           // nextSong.gainNode.gain.linearRampToValueAtTime(1, context.currentTime + fadeTime);
             if(skip) {
                 this.stopSong(currentSong, false);
             } else {
-                this.fadeOut(currentSong.type, currentSong, context.currentTime, fadeTime);
+                this.fadeOut(currentSong.type, currentSong, startTime, fadeTime);
             }
 
             this.playSong(nextSong, fadeTime, 0, true);
