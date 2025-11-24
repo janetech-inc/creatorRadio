@@ -665,11 +665,13 @@
           if (song._bufferSource) {
                 song._bufferSource.stop();
                 song._bufferSource.disconnect();                
-                song._bufferSource = null;                
+                song._bufferSource = null;  
           }
 
         },
         playNextSong: function(skip=false) {
+            this.tempCurrentTime = 0;
+            
            if (this.songs.length <= 1) return false;
             const currentSong = this.getCurrentSong();
             const currentIndex = this.getCurrentSongIndex();
