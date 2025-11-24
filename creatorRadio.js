@@ -513,7 +513,7 @@
                 this.logFadeEvent('fadeIn', {
                   warning: 'Missing gainNode',
                   type,
-                  song: getSongLabel(song),
+                  song: this.getSongLabel(song),
                   startTime,
                   fadeDuration,
                 });
@@ -550,7 +550,7 @@
 
         this.logFadeEvent('fadeIn', {
             type,
-            song: getSongLabel(song),
+            song: this.getSongLabel(song),
             startTime,
             fadeDuration,
             rampType,
@@ -567,7 +567,7 @@
                 this.logFadeEvent('fadeOut', {
                   warning: 'Missing gainNode',
                   type,
-                  song: getSongLabel(song),
+                  song: this.getSongLabel(song),
                   startTime,
                   fadeDuration,
                 });
@@ -608,7 +608,7 @@
 
           this.logFadeEvent('fadeOut', {
             type,
-            song: getSongLabel(song),
+            song: this.getSongLabel(song),
             startTime,
             fadeDuration,
             rampType,
