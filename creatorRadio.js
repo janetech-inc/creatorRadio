@@ -143,7 +143,7 @@
         this.audio.addEventListener("pause", function() {
             t.setPlayerState("paused", u),
             "mediaSession"in navigator && (navigator.mediaSession.playbackState = "paused")
-            if (isIOS && t._iosTimer) clearInterval(t._iosTimer);
+            if (t._iosTimer) clearInterval(t._iosTimer);
         }),
         this.audio.addEventListener("waiting", function() {
             t.targetSets[u.targetSetId] && t.targetSets[u.targetSetId].addClass("is-buffering")
