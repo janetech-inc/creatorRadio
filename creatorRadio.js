@@ -661,7 +661,7 @@
             }
         },
 
-        stopSong: function(song, dispath=false) {
+        stopSong: function(song, dispatch=false) {
           if (song._bufferSource) {
                 song._bufferSource.stop();
                 song._bufferSource.disconnect();                
