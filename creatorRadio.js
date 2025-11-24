@@ -499,7 +499,7 @@
         },
         
         // simple logger you can later swap with a backend call
-        this.logFadeEvent(direction, details) {
+        logFadeEvent(direction, details) {
           // You can change this to send to your server instead of console
           console.log(`[${direction.toUpperCase()}]`, {
             ts: performance.now(), // or Date.now()
