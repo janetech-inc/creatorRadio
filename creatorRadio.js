@@ -118,7 +118,7 @@
                 clearInterval(t._iosTimer);
                 t._iosTimer = setInterval(() => {
 
-                    if (t.isDragging || t.getPlayerState() == "paused") return !1;
+                    if (t.isDragging || t.getPlayerState() == "paused") return;
                   
                     const currentTime = Math.min(
                         audioContext.currentTime - t.getCurrentSong().startTime + t.tempCurrentTime,
@@ -350,8 +350,8 @@
         },
         stopCurrentSong: function() {
             this.pauseCurrentSong(),
-            this.stopSong(this.getCurrentSong()),
-            this.stopSong(this.getNextSong()),
+            this.stopSong(this.getCurrentSong(), true),
+            this.stopSong(this.getNextSong(), false),
             this.getCurrentSong().audio.currentTime = 0
         },
         pauseCurrentSong: function() {
@@ -360,8 +360,8 @@
             this.playButton.show(),
             e.truePlayerManager.activePlayer == this && (e.truePlayerManager.activePlayer = null,
             e.truePlayerManager.previouslyActivePlayer = this),
-            this.stopSong(this.getCurrentSong()),
-            this.stopSong(this.getNextSong())
+            this.stopSong(this.getCurrentSong(), true),
+            this.stopSong(this.getNextSong(), false)
            // this.getCurrentSong().audio.pause()
         },
         togglePauseCurrentSong: function() {
@@ -640,7 +640,7 @@
         }, 
         playSong: function(song, fadeTime = 2, offset = 0, dispatch=false) {
 
-            this.stopSong(song);
+            this.stopSong(song,false);
             const ctx = audioContext;
             const source = ctx.createBufferSource();
             const gainNode = ctx.createGain();
@@ -661,12 +661,17 @@
             }
         },
 
-        stopSong: function(song) {
+        stopSong: function(song, dispath=false) {
           if (song._bufferSource) {
                 song._bufferSource.stop();
                 song._bufferSource.disconnect();                
                 song._bufferSource = null;  
           }
+
+            if(dispatch) {
+                const pauseEvent = new Event('pause', { bubbles: true, cancelable: true })
+                song.audio.dispatchEvent(pauseEvent);
+            }
 
         },
         playNextSong: function(skip=false) {
@@ -729,7 +734,7 @@
          //   currentSong.gainNode.gain.exponentialRampToValueAtTime(0.01, context. fadeTime);
            // nextSong.gainNode.gain.linearRampToValueAtTime(1, context.currentTime + fadeTime);
             if(skip) {
-                this.stopSong(currentSong);
+                this.stopSong(currentSong, false);
             } else {
                 this.fadeOut(currentSong.type, currentSong, context.currentTime, fadeTime);
             }
@@ -738,7 +743,7 @@
             
             // Stop old track after fade completes
             setTimeout(() => {
-                this.stopSong(currentSong);
+                this.stopSong(currentSong,false);
                 this.setCurrentSong(nextIndex, false);
                 this.setPlayerState("playing", nextSong);
                 this._isCrossfading = false;
