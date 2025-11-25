@@ -528,7 +528,7 @@
           let targetValue = null;
           let endTime = null;
             
-          g.cancelScheduledValues(startTime);
+          g.cancelScheduledValues(audioContext.currentTime);
           g.setValueAtTime(0.001, startTime);
         
           switch (type) {
@@ -699,7 +699,7 @@
             const context = currentSong.getAudioContext();
 
             const endTime = this.getSongEndTime(currentSong);
-            const startTime = endTime - fadeTime;
+            const startTime = Math.max(0, endTime - fadeTime);
             
             if(skip) {
                 this.stopSong(currentSong, false);
