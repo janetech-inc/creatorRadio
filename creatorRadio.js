@@ -699,7 +699,7 @@
             const context = currentSong.getAudioContext();
 
             const endTime = this.getSongEndTime(currentSong);
-            const startTime = endTime - fadeDuration;
+            const startTime = endTime - fadeTime;
             
             if(skip) {
                 this.stopSong(currentSong, false);
