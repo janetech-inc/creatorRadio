@@ -280,14 +280,14 @@
         preloadPlayCurrentSong(fadeTime) {
             const song = this.getCurrentSong();
             const player = this;
-            if (!song || song.audioBuffer) player.playSong(song, 0, 0, true); // already preloaded
+            if (!song || song.audioBuffer) player.playSong(song, audioContext.currentTime, 0, 0, true); // already preloaded
         
             fetch(song.audio.currentSrc)
                 .then(res => res.arrayBuffer())
                 .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
                 .then(buffer => {
                     song.audioBuffer = buffer;
-                    player.playSong(song, 0, 0, true);
+                    player.playSong(song,audioContext.currentTime, 0, 0, true);
                 })
                 .catch(err => console.warn("Failed to preload song:", err));
         },
@@ -415,7 +415,7 @@
                 t(e).one("touchend", function() {
                     t(e).off("touchmove.trueAudioPlayer"),
                    // n.getCurrentSong().audio.currentTime = n.tempCurrentTime,
-                    n.playSong(n.getCurrentSong(), 0, n.tempCurrentTime, false);
+                    n.playSong(n.getCurrentSong(),audioContext.currentTime, 0, n.tempCurrentTime, false);
                     n.isDragging = !1
                 })
             }),
@@ -434,7 +434,7 @@
                 t(e).one("mouseup", function() {
                     t(e).off("mousemove.trueAudioPlayer"),
                     //n.getCurrentSong().audio.currentTime = n.tempCurrentTime,
-                    n.playSong(n.getCurrentSong(), 0, n.tempCurrentTime, false);
+                    n.playSong(n.getCurrentSong(), audioContext.currentTime, 0, n.tempCurrentTime, false);
                     n.isDragging = !1
                 })
             })
@@ -528,7 +528,7 @@
           let targetValue = null;
           let endTime = null;
             
-          g.cancelScheduledValues(audioContext.currentTime);
+          g.cancelScheduledValues(startTime);
           g.setValueAtTime(0.001, startTime);
         
           switch (type) {
@@ -641,12 +641,12 @@
         getSongEndTime(song) {
           // when source.start(startAt, offset)
           const startedAt = song.startTime || audioContext.currentTime;      // audioContext.currentTime when started
-          const offset = song.offset || this.tempCurrentTime;            // seconds into the track (resume)
+          const offset = song.offset;            // seconds into the track (resume)
           const duration = song.audio?.duration || 0;
         
           return startedAt + (duration - offset);
         },
-        playSong: function(song, fadeTime = 2, offset = 0, dispatch=false) {
+        playSong: function(song, startTime, fadeTime = 2, offset = 0, dispatch=false) {
 
             this.stopSong(song,false);
             const ctx = audioContext;
@@ -659,9 +659,9 @@
 
             song._bufferSource = source;
             song.gainNode = gainNode;
-            song.startTime = ctx.currentTime + offset; 
-            source.start(ctx.currentTime, offset);
-            this.fadeIn(song.type, song, ctx.currentTime + offset, fadeTime);
+            song.startTime = startTime + offset; 
+            source.start(song.startTime);
+            this.fadeIn(song.type, song, song.startTime, fadeTime);
 
             if(dispatch) {
                 const playEvent = new Event('play', { bubbles: true, cancelable: true })
@@ -707,7 +707,7 @@
                 this.fadeOut(currentSong.type, currentSong, startTime, fadeTime);
             }
 
-            this.playSong(nextSong, fadeTime, 0, true);
+            this.playSong(nextSong, startTime, fadeTime, 0, true);
             
             // Stop old track after fade completes
             setTimeout(() => {
