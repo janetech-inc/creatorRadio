@@ -650,7 +650,7 @@
         
           return startedAt + (duration - offset);
         },
-        playSong: function(song, startTime, fadeTime = 2, offset = 0, dispatch=false) {
+        playSong: function(song, fadeTime = 2, offset = 0, dispatch=false) {
 
             this.stopSong(song,false);
             const ctx = audioContext;
@@ -663,8 +663,8 @@
 
             song._bufferSource = source;
             song.gainNode = gainNode;
-            song.startTime = startTime + offset; 
-            source.start(song.startTime);
+            song.startTime = ctx.currentTime + offset; 
+            source.start(ctx.currentTime, offset);
             this.fadeIn(song.type, song, song.startTime, fadeTime);
 
             if(dispatch) {
@@ -705,10 +705,10 @@
             if(skip) {
                 this.stopSong(currentSong, false);
             } else {
-                this.fadeOut(currentSong.type, currentSong, startTime, fadeTime);
+                this.fadeOut(currentSong.type, currentSong, fadeTime);
             }
 
-            this.playSong(nextSong, startTime, fadeTime, 0, true);
+            this.playSong(nextSong, fadeTime, 0, true);
             
             // Stop old track after fade completes
             setTimeout(() => {
