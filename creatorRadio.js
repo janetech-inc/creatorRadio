@@ -280,14 +280,14 @@
         preloadPlayCurrentSong(fadeTime) {
             const song = this.getCurrentSong();
             const player = this;
-            if (!song || song.audioBuffer) player.playSong(song, audioContext.currentTime, 0, 0, true); // already preloaded
+            if (!song || song.audioBuffer) player.playSong(song, 0, 0, true); // already preloaded
         
             fetch(song.audio.currentSrc)
                 .then(res => res.arrayBuffer())
                 .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
                 .then(buffer => {
                     song.audioBuffer = buffer;
-                    player.playSong(song,audioContext.currentTime, 0, 0, true);
+                    player.playSong(song,0, 0, true);
                 })
                 .catch(err => console.warn("Failed to preload song:", err));
         },
@@ -415,7 +415,7 @@
                 t(e).one("touchend", function() {
                     t(e).off("touchmove.trueAudioPlayer"),
                    // n.getCurrentSong().audio.currentTime = n.tempCurrentTime,
-                    n.playSong(n.getCurrentSong(),audioContext.currentTime, 0, n.tempCurrentTime, false);
+                    n.playSong(n.getCurrentSong(), 0, n.tempCurrentTime, false);
                     n.isDragging = !1
                 })
             }),
@@ -434,7 +434,7 @@
                 t(e).one("mouseup", function() {
                     t(e).off("mousemove.trueAudioPlayer"),
                     //n.getCurrentSong().audio.currentTime = n.tempCurrentTime,
-                    n.playSong(n.getCurrentSong(), audioContext.currentTime, 0, n.tempCurrentTime, false);
+                    n.playSong(n.getCurrentSong(), 0, n.tempCurrentTime, false);
                     n.isDragging = !1
                 })
             })
