@@ -562,7 +562,7 @@
             
         },
 
-        fadeOut(type, song, startTime, fadeDuration) {
+        fadeOut(type, song, fadeDuration) {
             if(!song.gainNode) {
                 this.logFadeEvent('fadeOut', {
                   warning: 'Missing gainNode',
@@ -574,6 +574,10 @@
               
               return;
           }
+
+            
+          const endTime = this.getSongEndTime(song);
+          const startTime = Math.max(0, endTime - fadeDuration);
 
           const g = song.gainNode.gain;
           const beforeValue = g.value;
@@ -697,9 +701,6 @@
     
             // Reuse a single AudioContext per crossfade
             const context = currentSong.getAudioContext();
-
-            const endTime = this.getSongEndTime(currentSong);
-            const startTime = Math.max(0, endTime - fadeTime);
             
             if(skip) {
                 this.stopSong(currentSong, false);
