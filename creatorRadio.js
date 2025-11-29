@@ -575,9 +575,7 @@
               return;
           }
 
-            
-          const endTime = this.getSongEndTime(song);
-          const startTime = Math.max(0, endTime - fadeDuration);
+          const startTime = Math.max(0,  this.getSongEndTime(song) - fadeDuration);
 
           const g = song.gainNode.gain;
           const beforeValue = g.value;
