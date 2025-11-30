@@ -660,7 +660,8 @@
             gainNode.connect(ctx.destination);
             song._bufferSource = source;
             song.gainNode = gainNode;
-            song.startTime = ctx.currentTime + offset; 
+            song.startTime = ctx.currentTime;
+            song.offset = offset;
             source.start(ctx.currentTime, offset);
             if (fadeTime > 0) {
                 gainNode.gain.setValueAtTime(0, ctx.currentTime);
