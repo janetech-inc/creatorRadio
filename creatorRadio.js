@@ -625,7 +625,7 @@
           switch (outType) {
             case 'promo':
             case 'music':
-              return this.settings.fadeTime;
+              return this.settings.crossfadeDuration;
               break;
             case 'liner':
             case 'show':
@@ -637,7 +637,7 @@
                       return 0.5;
               }
             default:
-               return this.settings.fadeTime;
+               return this.settings.crossfadeDuration;
           }
         }, 
         getSongEndTime(song) {
