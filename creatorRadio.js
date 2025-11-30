@@ -644,7 +644,7 @@
         getSongEndTime(song) {
           // when source.start(startAt, offset)
           const startedAt = song.startTime || audioContext.currentTime;      // audioContext.currentTime when started
-          const offset = song.offset || 0;            // seconds into the track (resume)
+          const offset = song.offset || this.tempCurrentTime;               // seconds into the track (resume)
           const duration = song.audio?.duration || 0;
         
           return startedAt + (duration - offset);
