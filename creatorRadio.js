@@ -535,9 +535,10 @@
             case 'liner':
             case 'show':
             rampType = 'exponential';
-              targetValue = 1;
-              endTime = startTime + 0.0001;
-              g.exponentialRampToValueAtTime(targetValue, endTime);
+               targetValue = 1;
+               endTime = startTime;
+              //g.exponentialRampToValueAtTime(targetValue, endTime);
+              g.gain.setValueAtTime(1, startTime);
               break;
             case 'music':
             case 'promo':
@@ -589,16 +590,16 @@
           switch (type) {
             case 'music':
               rampType = 'exponential';
-              targetValue = 0.001;
+              targetValue = 0;
               endTime = startTime + fadeDuration;
               g.exponentialRampToValueAtTime(targetValue, endTime);
               break;
             case 'liner':
             case 'show':
-                rampType = 'exponential';
+                rampType = 'none';
                 targetValue = 1;
-                endTime = startTime + 0.0001;
-                g.exponentialRampToValueAtTime(targetValue, endTime);
+                endTime = startTime;
+                //g.exponentialRampToValueAtTime(targetValue, endTime);
                 break;
             case 'promo':
             default:
