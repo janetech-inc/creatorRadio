@@ -590,7 +590,7 @@
           switch (type) {
             case 'music':
               rampType = 'exponential';
-              targetValue = 0;
+              targetValue = 0.001;
               endTime = startTime + fadeDuration;
               g.exponentialRampToValueAtTime(targetValue, endTime);
               break;
@@ -604,7 +604,7 @@
             case 'promo':
             default:
               rampType = 'linear';
-              targetValue = 0;
+              targetValue = 0.001;
               endTime = startTime + fadeDuration;
               g.linearRampToValueAtTime(0, startTime + fadeDuration);
           }
