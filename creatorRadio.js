@@ -658,13 +658,17 @@
             source.buffer = song.audioBuffer;
             source.connect(gainNode);
             gainNode.connect(ctx.destination);
-            gainNode.gain.setValueAtTime(0, ctx.currentTime);
-
             song._bufferSource = source;
             song.gainNode = gainNode;
             song.startTime = ctx.currentTime + offset; 
             source.start(ctx.currentTime, offset);
-            this.fadeIn(song.type, song, song.startTime, fadeTime);
+            if (fadeTime > 0) {
+                gainNode.gain.setValueAtTime(0, ctx.currentTime);
+                this.fadeIn(song.type, song, song.startTime, fadeTime);
+            } else {
+                gainNode.gain.setValueAtTime(1, ctx.currentTime);
+            }
+
 
             if(dispatch) {
                 const playEvent = new Event('play', { bubbles: true, cancelable: true })
