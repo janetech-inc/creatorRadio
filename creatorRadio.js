@@ -129,7 +129,7 @@
                       , i = t.getCurrentSong().audio.duration;
                     t.updateSongDisplayTime(n, i)
         
-                    const fadeBeforeEnd = t.settings.crossfadeDuration || 2;
+                    const fadeBeforeEnd =  t.getCurrentSong().fadeOutTime || t.settings.crossfadeDuration || 2;
                     if (currentTime >= t.getCurrentSong().audio.duration - fadeBeforeEnd) {
                         if (t._fadeStarted) return;
                         t._fadeStarted = true;
@@ -698,8 +698,9 @@
             const currentIndex = this.getCurrentSongIndex();
             const nextIndex = this.songs[currentIndex + 1] ? currentIndex + 1 : 0;
             const nextSong = this.getNextSong()
-            this.settings.crossfadeDuration = this.fadeTime(currentSong.type, nextSong.type);
-            const fadeTime = this.settings.crossfadeDuration || 2;
+            currentSong.fadeOutTime = this.fadeTime(currentSong.type, nextSong.type);
+            nextSong.fadeInTime = currentSong.fadeOutTime ;
+            const fadeTime = currentSong.fadeOutTime || this.settings.crossfadeDuration || 2;
             // Mark that crossfade is in progres
             this._isCrossfading = true;
     
