@@ -538,7 +538,7 @@
                targetValue = 1;
                endTime = startTime;
               //g.exponentialRampToValueAtTime(targetValue, endTime);
-              g.gain.setValueAtTime(1, startTime);
+              g.setValueAtTime(1, startTime);
               break;
             case 'music':
             case 'promo':
