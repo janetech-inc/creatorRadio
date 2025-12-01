@@ -289,7 +289,6 @@
                     song.audioBuffer = buffer;
 
                     if ("playing" == this.getPlayerState()) {
-                        
                         player.playSong(song,0, 0, true);
                     }
                 })
@@ -324,6 +323,11 @@
                 .then(buffer => {
                     song.audioBuffer = buffer;
                     song.preloading = false;
+                    
+                    if (song.shouldPlay && "playing" == this.getPlayerState()) {
+                        this.playSong(song,0, 0, false);
+                        song.shouldPlay = false;
+                    }
                 })
                 .catch(err => {
                     console.warn("Failed to preload song:", err);
@@ -682,8 +686,8 @@
                 this.fadeIn(song.type, song, song.startTime, fadeTime);
             } else {
                 gainNode.gain.setValueAtTime(1, song.startTime);
+                song.shouldPlay = true;  
             }
-
 
             if(dispatch) {
                 const playEvent = new Event('play', { bubbles: true, cancelable: true })
