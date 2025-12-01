@@ -532,7 +532,7 @@
             const epsilon = 0.001; // 10ms safety margin
 
           const safeStart = Math.max(startTime, now + epsilon);
-          const endTime = safeStart + duration;
+         // endTime = safeStart + duration;
             
           g.cancelScheduledValues(safeStart);
           g.setValueAtTime(0.001, safeStart);
@@ -542,7 +542,7 @@
             case 'show':
             rampType = 'exponential';
                targetValue = 1;
-               endTime = startTime;
+               endTime = safeStart;
               //g.exponentialRampToValueAtTime(targetValue, endTime);
               g.setValueAtTime(1, safeStart);
               break;
