@@ -681,13 +681,19 @@
             song.gainNode = gainNode;
             song.startTime = ctx.currentTime;
             song.offset = offset;
-            source.start(song.startTime, offset);
-            if (fadeTime > 0 && !song.preloading) {
-                this.fadeIn(song.type, song, song.startTime, fadeTime);
+
+            if(!song.preloading) {
+              source.start(song.startTime, offset);
+              if (fadeTime > 0) {
+                    this.fadeIn(song.type, song, song.startTime, fadeTime);
+                } else {
+                    gainNode.gain.setValueAtTime(1, song.startTime);
+              
+                }
             } else {
-                gainNode.gain.setValueAtTime(1, song.startTime);
                 song.shouldPlay = true;  
             }
+      
 
             if(dispatch) {
                 const playEvent = new Event('play', { bubbles: true, cancelable: true })
