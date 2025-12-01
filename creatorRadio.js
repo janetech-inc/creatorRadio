@@ -680,10 +680,10 @@
             song._bufferSource = source;
             song.gainNode = gainNode;
             song.startTime = ctx.currentTime;
-            song.started = true;
             song.offset = offset;
 
             if(!song.preloading) {
+              song.started = true;
               source.start(song.startTime, offset);
               if (fadeTime > 0) {
                     this.fadeIn(song.type, song, song.startTime, fadeTime);
