@@ -664,7 +664,6 @@
             song.offset = offset;
             source.start(ctx.currentTime, offset);
             if (fadeTime > 0) {
-                gainNode.gain.setValueAtTime(0, ctx.currentTime);
                 this.fadeIn(song.type, song, song.startTime, fadeTime);
             } else {
                 gainNode.gain.setValueAtTime(1, ctx.currentTime);
