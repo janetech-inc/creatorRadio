@@ -287,7 +287,11 @@
                 .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
                 .then(buffer => {
                     song.audioBuffer = buffer;
-                    player.playSong(song,0, 0, true);
+
+                    if ("playing" == this.getPlayerState()) {
+                        
+                        player.playSong(song,0, 0, true);
+                    }
                 })
                 .catch(err => console.warn("Failed to preload song:", err));
         },
@@ -528,30 +532,30 @@
           let targetValue = null;
           let endTime = null;
 
-            const now = audioContext.currentTime;
-            const epsilon = 0.001; // 10ms safety margin
+         //   const now = audioContext.currentTime;
+        //    const epsilon = 0.001; // 10ms safety margin
 
-          const safeStart = Math.max(startTime, now + epsilon);
+       //   const safeStart = Math.max(startTime, now + epsilon);
          // endTime = safeStart + duration;
             
-          g.cancelScheduledValues(safeStart);
-          g.setValueAtTime(0.001, safeStart);
+          g.cancelScheduledValues(startTime);
+          g.setValueAtTime(0.001, startTime);
         
           switch (type) {
             case 'liner':
             case 'show':
             rampType = 'exponential';
                targetValue = 1;
-               endTime = safeStart;
+               endTime = startTime;
               //g.exponentialRampToValueAtTime(targetValue, endTime);
-              g.setValueAtTime(1, safeStart);
+              g.setValueAtTime(1, startTime);
               break;
             case 'music':
             case 'promo':
             default:
               rampType = 'linear';
               targetValue = 1;
-              endTime = safeStart + fadeDuration;
+              endTime = startTime + fadeDuration;
               g.linearRampToValueAtTime(targetValue, endTime);
           }
 
@@ -671,7 +675,7 @@
             song.startTime = ctx.currentTime;
             song.offset = offset;
             source.start(song.startTime, offset);
-            if (fadeTime > 0) {
+            if (fadeTime > 0 && !song.preloading) {
                 this.fadeIn(song.type, song, song.startTime, fadeTime);
             } else {
                 gainNode.gain.setValueAtTime(1, song.startTime);
