@@ -669,6 +669,8 @@
           return startedAt + (duration - offset);
         },
         playSong: function(song, fadeTime = 2, offset = 0, dispatch=false) {
+
+            this.stopSong(song, false);
             const ctx = audioContext;
             const source = ctx.createBufferSource();
             const gainNode = ctx.createGain();
@@ -678,6 +680,7 @@
             song._bufferSource = source;
             song.gainNode = gainNode;
             song.startTime = ctx.currentTime;
+            song.started = true;
             song.offset = offset;
 
             if(!song.preloading) {
@@ -701,7 +704,10 @@
 
         stopSong: function(song, dispatch=false) {
           if (song._bufferSource) {
+               if (song.started) {
                 song._bufferSource.stop();
+               }
+                song.started = false;
                 song._bufferSource.disconnect();                
                 song._bufferSource = null;  
           }
