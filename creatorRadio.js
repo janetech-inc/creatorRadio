@@ -558,6 +558,8 @@
         this.logFadeEvent('fadeIn', {
             type,
             song: this.getSongLabel(song),
+            preloading: song.preloading,
+            audioBigger: song._bufferSource,
             safeStart,
             fadeDuration,
             rampType,
