@@ -669,8 +669,6 @@
           return startedAt + (duration - offset);
         },
         playSong: function(song, fadeTime = 2, offset = 0, dispatch=false) {
-
-            this.stopSong(song,false);
             const ctx = audioContext;
             const source = ctx.createBufferSource();
             const gainNode = ctx.createGain();
