@@ -567,7 +567,7 @@
             song: this.getSongLabel(song),
             preloading: song.preloading,
             audioBigger: song._bufferSource,
-            safeStart,
+            startTime,
             fadeDuration,
             rampType,
             targetValue,
