@@ -351,12 +351,14 @@
             e.truePlayerManager.activePlayer = this,
             this.settings.crossfadeDuration = this.fadeTime( this.getCurrentSong().type, this.getNextSong().type);
             this.preloadPlayCurrentSong(this.settings.crossfadeDuration);
+             this.setPlayerState("playing", this.getCurrentSong());
         },
         stopCurrentSong: function() {
             this.pauseCurrentSong(),
             this.stopSong(this.getCurrentSong(), true),
             this.stopSong(this.getNextSong(), false),
             this.getCurrentSong().audio.currentTime = 0
+            this.setPlayerState("paused", this.getCurrentSong());
         },
         pauseCurrentSong: function() {
             
@@ -366,6 +368,7 @@
             e.truePlayerManager.previouslyActivePlayer = this),
             this.stopSong(this.getCurrentSong(), true),
             this.stopSong(this.getNextSong(), false)
+            this.setPlayerState("paused", this.getCurrentSong());
            // this.getCurrentSong().audio.pause()
         },
         togglePauseCurrentSong: function() {
