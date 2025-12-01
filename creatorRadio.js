@@ -307,10 +307,10 @@
                     index = this.getCurrentSongIndex();
                     let nextSong = this.getSongAt(index + 2);
                     if (!nextSong.audioBuffer) {
-                         return this.preloadSong(song, depth + 1);
+                         return this.preloadSong(nextSong, depth + 1);
                     } else {
                         nextSong = this.getSongAt(index + 3)
-                        return this.preloadSong(song, depth + 1);
+                        return this.preloadSong(nextSong, depth + 1);
                     }
            
                 } else { return; }
@@ -497,7 +497,7 @@
               // try to pull duration from common fields
               const duration =
                 song.audio?.duration ||
-                song._audioBuffer?.duration ||
+                song.audioBuffer?.duration ||
                 null;
             
               return duration
