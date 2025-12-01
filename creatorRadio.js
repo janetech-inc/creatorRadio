@@ -527,9 +527,15 @@
           let rampType = null;
           let targetValue = null;
           let endTime = null;
+
+            const now = audioContext.currentTime;
+            const epsilon = 0.001; // 10ms safety margin
+
+          const safeStart = Math.max(startTime, now + epsilon);
+          const endTime = safeStart + duration;
             
-          g.cancelScheduledValues(startTime);
-          g.setValueAtTime(0.001, startTime);
+          g.cancelScheduledValues(safeStart);
+          g.setValueAtTime(0.001, safeStart);
         
           switch (type) {
             case 'liner':
@@ -538,21 +544,21 @@
                targetValue = 1;
                endTime = startTime;
               //g.exponentialRampToValueAtTime(targetValue, endTime);
-              g.setValueAtTime(1, startTime);
+              g.setValueAtTime(1, safeStart);
               break;
             case 'music':
             case 'promo':
             default:
               rampType = 'linear';
               targetValue = 1;
-              endTime = startTime + fadeDuration;
+              endTime = safeStart + fadeDuration;
               g.linearRampToValueAtTime(targetValue, endTime);
           }
 
         this.logFadeEvent('fadeIn', {
             type,
             song: this.getSongLabel(song),
-            startTime,
+            safeStart,
             fadeDuration,
             rampType,
             targetValue,
@@ -662,11 +668,11 @@
             song.gainNode = gainNode;
             song.startTime = ctx.currentTime;
             song.offset = offset;
-            source.start(ctx.currentTime, offset);
+            source.start(song.startTime, offset);
             if (fadeTime > 0) {
                 this.fadeIn(song.type, song, song.startTime, fadeTime);
             } else {
-                gainNode.gain.setValueAtTime(1, ctx.currentTime);
+                gainNode.gain.setValueAtTime(1, song.startTime);
             }
 
 
@@ -682,6 +688,8 @@
                 song._bufferSource.disconnect();                
                 song._bufferSource = null;  
           }
+
+        song.offset = 0;
 
             if(dispatch) {
                 const pauseEvent = new Event('pause', { bubbles: true, cancelable: true })
