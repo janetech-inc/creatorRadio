@@ -44,6 +44,25 @@
         this._thumbnailBlob = "",
         this._thumbnailBlobUrl = "",
         this._isCrossfading = false,
+        
+            audioContext.onstatechange = () => {
+                
+                    if (audioContext.state === 'interrupted') {
+                        console.log('AudioContext was interrupted by the UA.');
+
+                        // Handle the pause in your application logic
+                      } 
+                    else if (audioContext.state === 'running') {
+                        console.log('AudioContext is running.');
+                        // Resume your application logic
+                    }
+                    // iOS Safari fix
+                    else if (audioContext.state === 'suspended') {
+                        console.log('AudioContext was suspended by the UA.');
+              
+                    }
+                };
+        
 
         this.getThumbnail = function() {
             return this._thumbnail
@@ -92,26 +111,7 @@
             t.setPlayerState("playing", u),
             "mediaSession"in navigator && (navigator.mediaSession.playbackState = "playing")
 
-            if (!t._audioContext) {
-                t._audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                t._audioContext.onstatechange = () => {
-                
-                    if (t._audioContext.state === 'interrupted') {
-                        console.log('AudioContext was interrupted by the UA.');
-                        t._audioContext.resume().catch(() => {});
-                        // Handle the pause in your application logic
-                      } 
-                    else if (t._audioContext.state === 'running') {
-                        console.log('AudioContext is running.');
-                        // Resume your application logic
-                    }
-                    // iOS Safari fix
-                    else if (t._audioContext.state === 'suspended') {
-                        console.log('AudioContext was suspended by the UA.');
-                        t._audioContext.resume().catch(() => {});
-                    }
-                };
-            }
+     
             
             
             if (true) {
@@ -361,19 +361,22 @@
             this.pauseCurrentSong(),
             this.stopSong(this.getCurrentSong(), true),
             this.stopSong(this.getNextSong(), false),
-            this.getCurrentSong().audio.currentTime = 0
             this.setPlayerState("paused", this.getCurrentSong());
         },
         pauseCurrentSong: function() {
-            
+
+            const song = this.getCurrentSong();
+            if (song) {
+                song.offset = this.getPlaybackPosition(song);
+            }
             this.pauseButton.hide(),
             this.playButton.show(),
             e.truePlayerManager.activePlayer == this && (e.truePlayerManager.activePlayer = null,
             e.truePlayerManager.previouslyActivePlayer = this),
-            this.stopSong(this.getCurrentSong(), true),
+            this.stopSong(song, true),
             this.stopSong(this.getNextSong(), false)
             this.setPlayerState("paused", this.getCurrentSong());
-           // this.getCurrentSong().audio.pause()
+    
         },
         togglePauseCurrentSong: function() {
             "playing" == this.getPlayerState() ? this.pauseCurrentSong() : this.playCurrentSong()
@@ -668,6 +671,23 @@
         
           return startedAt + (duration - offset);
         },
+        getPlaybackPosition(song) {
+            if (!song) return 0;
+        
+            const ctx = audioContext;
+            const startedAt = song.startTime ?? ctx.currentTime;
+            const baseOffset = song.offset || 0;
+        
+            const elapsed = ctx.currentTime - startedAt;
+            const rawPos  = baseOffset + Math.max(0, elapsed);
+        
+            const duration =
+                song.audioBuffer?.duration ||
+                Infinity;
+        
+            return Math.min(rawPos, duration);
+        },
+        
         playSong: function(song, fadeTime = 2, offset = 0, dispatch=false) {
 
             this.stopSong(song, false);
@@ -711,8 +731,6 @@
                 song._bufferSource.disconnect();                
                 song._bufferSource = null;  
           }
-
-        song.offset = 0;
 
             if(dispatch) {
                 const pauseEvent = new Event('pause', { bubbles: true, cancelable: true })
