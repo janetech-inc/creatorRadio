@@ -121,7 +121,7 @@
                     if (t.isDragging || t.getPlayerState() == "paused") return;
                   
                     const currentTime = Math.min(
-                        audioContext.currentTime - (t.getCurrentSong().startTime || 0 ) + t.tempCurrentTime,
+                        audioContext.currentTime - (t.getCurrentSong().startTime || 0 ) + t.getCurrentSong().offset,
                         t.getCurrentSong().audio.duration
                     );
                     
@@ -670,7 +670,10 @@
           // when source.start(startAt, offset)
           const startedAt = song.startTime || audioContext.currentTime;      // audioContext.currentTime when started
           const offset = song.offset || this.tempCurrentTime;               // seconds into the track (resume)
-          const duration = song.audio?.duration || 0;
+          const duration =
+                this.getCurrentSong().audio.duration ||
+                song.audioBuffer?.duration ||
+                0;
         
           return startedAt + (duration - offset);
         },
@@ -685,6 +688,7 @@
             const rawPos  = baseOffset + Math.max(0, elapsed);
         
             const duration =
+                this.getCurrentSong().audio.duration ||
                 song.audioBuffer?.duration ||
                 Infinity;
         
