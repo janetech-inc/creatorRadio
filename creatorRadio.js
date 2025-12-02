@@ -280,7 +280,7 @@
         preloadPlayCurrentSong(fadeTime) {
             const song = this.getCurrentSong();
             const player = this;
-            if (!song || song.audioBuffer) player.playSong(song, 0, 0, true); // already preloaded
+            if (!song || song.audioBuffer) player.playSong(song, 0, song.offset || 0, true); // already preloaded
         
             fetch(song.audio.currentSrc)
                 .then(res => res.arrayBuffer())
@@ -289,7 +289,7 @@
                     song.audioBuffer = buffer;
 
                     if ("playing" == this.getPlayerState()) {
-                        player.playSong(song,0, 0, true);
+                        player.playSong(song,0, song.offset || 0, true);
                     }
                 })
                 .catch(err => console.warn("Failed to preload song:", err));
@@ -358,10 +358,13 @@
              this.setPlayerState("playing", this.getCurrentSong());
         },
         stopCurrentSong: function() {
+            const song = this.getCurrentSong();
             this.pauseCurrentSong(),
-            this.stopSong(this.getCurrentSong(), true),
+            this.stopSong(song, true),
+            song.offset =0;
             this.stopSong(this.getNextSong(), false),
             this.setPlayerState("paused", this.getCurrentSong());
+            
         },
         pauseCurrentSong: function() {
 
