@@ -782,7 +782,7 @@
                 this.setPlayerState("playing", nextSong);
                 this._isCrossfading = false;
                 this._fadeStarted = false;
-            }, Math.max(fadeTime, 1) * 1000);
+            }, Math.max(fadeTime, 1.5) * 1000);
             
         },
         setPlayerState: function(t, e) {
