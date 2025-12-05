@@ -122,15 +122,15 @@
                   
                     const currentTime = Math.min(
                         audioContext.currentTime - (t.getCurrentSong().startTime || 0 ) + t.getCurrentSong().offset,
-                        t.getCurrentSong().audio.duration
+                        t.getCurrentSong().audioBuffer?.duration || 0
                     );
                     
                     var n = currentTime
-                      , i = t.getCurrentSong().audio.duration;
+                      , i =  t.getCurrentSong().audioBuffer?.duration || 0;
                     t.updateSongDisplayTime(n, i)
         
                     const fadeBeforeEnd =  t.getCurrentSong().fadeOutTime || t.settings.crossfadeDuration || 2;
-                    if (currentTime >= t.getCurrentSong().audio.duration - fadeBeforeEnd) {
+                    if (currentTime >= (t.getCurrentSong().audioBuffer?.duration ?? Infinity) - fadeBeforeEnd) {
                         if (t._fadeStarted) return;
                         t._fadeStarted = true;
                         t.playNextSong(false);
@@ -506,7 +506,6 @@
             
               // try to pull duration from common fields
               const duration =
-                song.audio?.duration ||
                 song.audioBuffer?.duration ||
                 null;
             
@@ -706,11 +705,11 @@
             gainNode.connect(ctx.destination);
             song._bufferSource = source;
             song.gainNode = gainNode;
-            song.startTime = ctx.currentTime;
             song.offset = offset;
 
             if(!song.preloading) {
               song.started = true;
+              song.startTime = ctx.currentTime;
               source.start(song.startTime, offset);
               if (fadeTime > 0) {
                     this.fadeIn(song.type, song, song.startTime, fadeTime);
@@ -718,15 +717,15 @@
                     gainNode.gain.setValueAtTime(1, song.startTime);
               
                 }
+
+                if(dispatch) {
+                    const playEvent = new Event('play', { bubbles: true, cancelable: true })
+                    song.audio.dispatchEvent(playEvent);
+                }
             } else {
                 song.shouldPlay = true;  
             }
-      
-
-            if(dispatch) {
-                const playEvent = new Event('play', { bubbles: true, cancelable: true })
-                song.audio.dispatchEvent(playEvent);
-            }
+    
         },
 
         stopSong: function(song, dispatch=false) {
