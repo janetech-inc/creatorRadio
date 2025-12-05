@@ -671,8 +671,8 @@
           const startedAt = song.startTime || audioContext.currentTime;      // audioContext.currentTime when started
           const offset = song.offset || this.tempCurrentTime;               // seconds into the track (resume)
           const duration =
-                this.getCurrentSong().audio.duration ||
                 song.audioBuffer?.duration ||
+                song.audio?.duration ||
                 0;
         
           return startedAt + (duration - offset);
