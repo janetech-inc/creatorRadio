@@ -267,7 +267,7 @@
             this.initProgressBarEvents(),
             this.initVolumeBarEvents(),
             this.initAjaxLoadObserver(),
-            this.initMediaAPIActions(),
+            this.initMediaAPIActions()) : console.error("There are no songs in the player.")
 
             document.addEventListener("touchstart", () => {
                      audioContext.resume(), { once: true };
