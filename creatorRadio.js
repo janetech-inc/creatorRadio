@@ -269,6 +269,11 @@
             this.initAjaxLoadObserver(),
             this.initMediaAPIActions()) : console.error("There are no songs in the player.")
 
+            const savedIndex = localStorage.getItem("currentSongIndex");
+            const currentSongIndex = savedIndex !== null ? Number(savedIndex) : 0;
+            this.setCurrentSong(currentSongIndex);
+
+            
             document.addEventListener("touchstart", () => {
                      audioContext.resume(), { once: true };
                    // if (!this._iosUnlocked) this.unlockAudioContext();
@@ -858,8 +863,6 @@
                 return t.get()
             });
             t(s).on("click", function(t) {
-                const savedIndex = localStorage.getItem("currentSongIndex");
-                const currentSongIndex = savedIndex !== null ? Number(savedIndex) : 0;
                 
                 var e = n.songs.map(function(t, e) {
                     return songMap = {
@@ -873,8 +876,7 @@
                 e.filter(function(t) {
                     return t.song.id == i
                 }).length > 0 ? n.togglePauseCurrentSong() : (n.stopCurrentSong(),
-       
-                n.setCurrentSong(e[currentSongIndex].globalIndex, true),                                         
+                n.setCurrentSong(e[0].globalIndex, true),                                         
                 n.playCurrentSong())
             }),
             t(e).find('[tmplayer-element="audio"]').hide().each(function(t, i) {
