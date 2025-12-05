@@ -355,7 +355,7 @@
             e.truePlayerManager.activePlayer = this,
             this.settings.crossfadeDuration = this.fadeTime( this.getCurrentSong().type, this.getNextSong().type);
             this.preloadPlayCurrentSong(this.settings.crossfadeDuration);
-             this.setPlayerState("playing", this.getCurrentSong());
+            this.setPlayerState("playing", this.getCurrentSong());
         },
         stopCurrentSong: function() {
             const song = this.getCurrentSong();
@@ -413,7 +413,9 @@
             this.$albumName.text(e.album),
             this.$artistName.text(e.artist),
             this.$duration.text(e.durationString),
-            this.$genre.text(e.genre)
+            this.$genre.text(e.genre),
+            localStorage.setItem("currentSongIndex", t)
+
         },
         initProgressBarEvents: function() {
             var n = this;
@@ -869,7 +871,9 @@
                 e.filter(function(t) {
                     return t.song.id == i
                 }).length > 0 ? n.togglePauseCurrentSong() : (n.stopCurrentSong(),
-                n.setCurrentSong(e[0].globalIndex, true),                                         
+                const savedIndex = localStorage.getItem("currentSongIndex");
+                const currentSongIndex = savedIndex !== null ? Number(savedIndex) : 0;
+                n.setCurrentSong(e[currentSongIndex].globalIndex, true),                                         
                 n.playCurrentSong())
             }),
             t(e).find('[tmplayer-element="audio"]').hide().each(function(t, i) {
