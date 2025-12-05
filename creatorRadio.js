@@ -859,6 +859,9 @@
                 return t.get()
             });
             t(s).on("click", function(t) {
+                const savedIndex = localStorage.getItem("currentSongIndex");
+                const currentSongIndex = savedIndex !== null ? Number(savedIndex) : 0;
+                
                 var e = n.songs.map(function(t, e) {
                     return songMap = {
                         globalIndex: e,
@@ -871,8 +874,7 @@
                 e.filter(function(t) {
                     return t.song.id == i
                 }).length > 0 ? n.togglePauseCurrentSong() : (n.stopCurrentSong(),
-                const savedIndex = localStorage.getItem("currentSongIndex");
-                const currentSongIndex = savedIndex !== null ? Number(savedIndex) : 0;
+       
                 n.setCurrentSong(e[currentSongIndex].globalIndex, true),                                         
                 n.playCurrentSong())
             }),
