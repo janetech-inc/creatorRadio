@@ -110,10 +110,10 @@
             t.targetSets[u.targetSetId] && t.targetSets[u.targetSetId].removeClass("is-buffering"),
             t.setPlayerState("playing", u),
             "mediaSession"in navigator && (navigator.mediaSession.playbackState = "playing")
+             if (audioContext.state === "suspended") {
+                audioContext.resume();
+              }
 
-     
-            
-            
             if (true) {
                 clearInterval(t._iosTimer);
                 t._iosTimer = setInterval(() => {
