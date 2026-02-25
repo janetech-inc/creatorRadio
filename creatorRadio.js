@@ -84,23 +84,7 @@
             return audioContext;
         }
         ,   
-        this.audio.addEventListener("timeupdate", function(e) {
-            if (t.isDragging)
-                return !1;
-            var n = t.getCurrentSong().audio.currentTime
-              , i = t.getCurrentSong().audio.duration;
-            t.updateSongDisplayTime(n, i)
 
-              // Start crossfade when approaching end
-            const fadeBeforeEnd = t.settings.crossfadeDuration || 2;
-            if (i && n >= i - fadeBeforeEnd && !t._fadeStarted) {
-                t._fadeStarted = true;
-                t.playNextSong(false);
-            }
-             else {
-                        t.preloadSong();
-                    }
-        }),
         this.audio.addEventListener("volumechange", function(e) {
             var n = 100 * e.srcElement.volume;
             t.$volumeBar.width(n + "%")
@@ -274,11 +258,59 @@
             this.setCurrentSong(currentSongIndex);
 
             
-            document.addEventListener("touchstart", () => {
-                     audioContext.resume(), { once: true };
-                   // if (!this._iosUnlocked) this.unlockAudioContext();
-                }, { once: true });
+            document.addEventListener("touchstart", function unlockIOSAudio() {
+                if (audioContext.state !== "running") {
+                    audioContext.resume();
+                }
+            
+                // iOS silent switch unlock
+                const buffer = audioContext.createBuffer(1, 1, 22050);
+                const source = audioContext.createBufferSource();
+                source.buffer = buffer;
+                source.connect(audioContext.destination);
+                source.start(0);
+            
+            }, { once: true });
            
+        },
+
+        handleInternalPause: function(song) {
+            this.setPlayerState("paused", song),
+            "mediaSession"in navigator && (navigator.mediaSession.playbackState = "paused")
+            if (this._iosTimer) clearInterval(this._iosTimer);
+        },
+        handleInternalPlay: function(song) {
+            this.targetSets[u.targetSetId] && this.targetSets[u.targetSetId].removeClass("is-buffering"),
+            this.setPlayerState("playing", song),
+            "mediaSession"in navigator && (navigator.mediaSession.playbackState = "playing")
+             if (audioContext.state === "suspended") {
+                audioContext.resume();
+              }
+
+                clearInterval(t._iosTimer);
+                this._iosTimer = setInterval(() => {
+
+                    if (this.isDragging || this.getPlayerState() == "paused") return;
+                  
+                    const currentTime = Math.min(
+                        audioContext.currentTime - (this.getCurrentSong().startTime || 0 ) + this.getCurrentSong().offset,
+                        this.getCurrentSong().audioBuffer?.duration || 0
+                    );
+                    
+                    var n = currentTime
+                      , i =  this.getCurrentSong().audioBuffer?.duration || 0;
+                    t.updateSongDisplayTime(n, i)
+        
+                    const fadeBeforeEnd =  this.getCurrentSong().fadeOutTime || this.settings.crossfadeDuration || 2;
+                    if (currentTime >= (this.getCurrentSong().audioBuffer?.duration ?? Infinity) - fadeBeforeEnd) {
+                        if (this._fadeStarted) return;
+                        this._fadeStarted = true;
+                        this.playNextSong(false);
+                    } else {
+                        this.preloadSong(t.getNextSong(),0);
+                    }
+                }, 200);
+ 
         },
 
         preloadPlayCurrentSong(fadeTime) {
@@ -352,12 +384,31 @@
             this.getCurrentSong().audio.volume = t
         },
         playCurrentSong: function() {
-            e.truePlayerManager.activePlayer && e.truePlayerManager.activePlayer != this && e.truePlayerManager.activePlayer.pauseCurrentSong(),
-            this.pauseButton.show(),
-            this.playButton.hide(),
-            this.getCurrentSong().audio.volume = this.getVolume(),
-            e.truePlayerManager.activePlayer = this,
-            this.settings.crossfadeDuration = this.fadeTime( this.getCurrentSong().type, this.getNextSong().type);
+            // 🔥 iOS silent switch fix
+            if (audioContext.state !== "running") {
+                audioContext.resume();
+        
+                const buffer = audioContext.createBuffer(1, 1, 22050);
+                const source = audioContext.createBufferSource();
+                source.buffer = buffer;
+                source.connect(audioContext.destination);
+                source.start(0);
+            }
+        
+            e.truePlayerManager.activePlayer && e.truePlayerManager.activePlayer != this && e.truePlayerManager.activePlayer.pauseCurrentSong();
+        
+            this.pauseButton.show();
+            this.playButton.hide();
+        
+            this.getCurrentSong().audio.volume = this.getVolume();
+        
+            e.truePlayerManager.activePlayer = this;
+        
+            this.settings.crossfadeDuration = this.fadeTime(
+                this.getCurrentSong().type,
+                this.getNextSong().type
+            );
+        
             this.preloadPlayCurrentSong(this.settings.crossfadeDuration);
             this.setPlayerState("playing", this.getCurrentSong());
         },
@@ -725,8 +776,7 @@
                 }
 
                 if(dispatch) {
-                    const playEvent = new Event('play', { bubbles: true, cancelable: true })
-                    song.audio.dispatchEvent(playEvent);
+                    handleInternalPlay(song);
                 }
             } else {
                 song.shouldPlay = true;  
@@ -746,7 +796,9 @@
 
             if(dispatch) {
                 const pauseEvent = new Event('pause', { bubbles: true, cancelable: true })
-                song.audio.dispatchEvent(pauseEvent);
+               // song.audio.dispatchEvent(pauseEvent);
+                handleInternalPause(song);
+                
             }
 
         },
