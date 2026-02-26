@@ -280,14 +280,14 @@
             if (this._iosTimer) clearInterval(this._iosTimer);
         },
         handleInternalPlay: function(song) {
-            this.targetSets[u.targetSetId] && this.targetSets[u.targetSetId].removeClass("is-buffering"),
+            this.targetSets[song.targetSetId] && this.targetSets[song.targetSetId].removeClass("is-buffering"),
             this.setPlayerState("playing", song),
             "mediaSession"in navigator && (navigator.mediaSession.playbackState = "playing")
              if (audioContext.state === "suspended") {
                 audioContext.resume();
               }
 
-                clearInterval(t._iosTimer);
+                clearInterval(this._iosTimer);
                 this._iosTimer = setInterval(() => {
 
                     if (this.isDragging || this.getPlayerState() == "paused") return;
@@ -299,7 +299,7 @@
                     
                     var n = currentTime
                       , i =  this.getCurrentSong().audioBuffer?.duration || 0;
-                    t.updateSongDisplayTime(n, i)
+                    this.updateSongDisplayTime(n, i)
         
                     const fadeBeforeEnd =  this.getCurrentSong().fadeOutTime || this.settings.crossfadeDuration || 2;
                     if (currentTime >= (this.getCurrentSong().audioBuffer?.duration ?? Infinity) - fadeBeforeEnd) {
