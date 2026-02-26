@@ -28,12 +28,13 @@
         this.$parentElem,
         this.audio = new Audio,
         this.audio.crossOrigin = "anonymous";
-        this.audio.preload = "auto";
-        var l = n.createElement("source");
-        l.setAttribute("src", e),
-        a && (a = a.replace("\\", "/"),
-        l.setAttribute("type", a)),
-        this.audio.append(l),
+       // this.audio.preload = "auto";
+        //var l = n.createElement("source");
+        //l.setAttribute("src", e),
+        //a && (a = a.replace("\\", "/"),
+        //l.setAttribute("type", a)),
+     //   this.audio.append(l),
+        this.url = e;
         this.title = "",
         this.artist = "",
         this.album = "",
@@ -142,8 +143,8 @@
             if (isIOS && t._iosTimer) clearInterval(t._iosTimer);
         }), 
         this.audio.addEventListener("loadedmetadata", function() {
-            var e = parseInt(u.audio.duration / 60, 10)
-              , n = parseInt(u.audio.duration % 60);
+            var e = parseInt(u.audioBuffer?.duration / 60, 10)
+              , n = parseInt(u.audioBuffer?.duration % 60);
             n = n >= 10 ? n : "0" + n,
             u.durationString = e + ":" + n,
             u.$parentElem && u.$parentElem.find('[tmplayer-interaction="populate-duration"]').text(u.durationString),
@@ -318,7 +319,7 @@
             const player = this;
             if (!song || song.audioBuffer) player.playSong(song, 0, song.offset || 0, true); // already preloaded
         
-            fetch(song.audio.currentSrc)
+            fetch(song.url)
                 .then(res => res.arrayBuffer())
                 .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
                 .then(buffer => {
@@ -353,7 +354,7 @@
             
             song.preloading = true;
         
-            fetch(song.audio.currentSrc)
+            fetch(song.url)
                 .then(res => res.arrayBuffer())
                 .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
                 .then(buffer => {
@@ -475,12 +476,12 @@
         initProgressBarEvents: function() {
             var n = this;
             n.$progressBarWrapper.on("touchstart", function(i) {
-                if (i.preventDefault(),
-                0 == n.getCurrentSong().audio.readyState)
-                    return !1;
+               if (i.preventDefault(),
+                !n.getCurrentSong().audioBuffer)
+                return !1;
                 n.isDragging = !0;
                 var r = n.scrubSong(i)
-                  , a = n.getCurrentSong().audio.duration;
+                  , a = n.getCurrentSong().audioBuffer?.duration;
                 n.updateSongDisplayTime(r, a),
                 t(e).on("touchmove.trueAudioPlayer", function(t) {
                     var e = n.scrubSong(t);
@@ -494,12 +495,12 @@
                 })
             }),
             n.$progressBarWrapper.on("mousedown", function(i) {
-                if (i.preventDefault(),
-                0 == n.getCurrentSong().audio.readyState)
+                 if (i.preventDefault(),
+                    !n.getCurrentSong().audioBuffer)
                     return !1;
                 n.isDragging = !0;
                 var r = n.scrubSong(i)
-                  , a = n.getCurrentSong().audio.duration;
+                  , a = n.getCurrentSong().audioBuffer?.duration;
                 n.updateSongDisplayTime(r, a),
                 t(e).on("mousemove.trueAudioPlayer", function(t) {
                     var e = n.scrubSong(t);
@@ -541,7 +542,7 @@
               , n = this.$progressBarWrapper.width()
               , i = (e - this.$progressBarWrapper.offset().left) / n;
             i < 0 ? i = 0 : i > 1 && (i = 1);
-            var r = this.getCurrentSong().audio.duration * (i = i < 0 ? 0 : i);
+            var r = this.getCurrentSong().audioBuffer?.duration * (i = i < 0 ? 0 : i);
             return this.tempCurrentTime = r,
             r
         },
@@ -744,7 +745,7 @@
             const rawPos  = baseOffset + Math.max(0, elapsed);
         
             const duration =
-                this.getCurrentSong().audio.duration ||
+                this.getCurrentSong().audioBuffer?.duration ||
                 song.audioBuffer?.duration ||
                 Infinity;
         
@@ -986,7 +987,7 @@
             }
             ], ["seekforward", function(e) {
                 var n = e.seekOffset || 10;
-                t.getCurrentSong().audio.currentTime = Math.max(t.getCurrentSong().audio.currentTime + n, t.getCurrentSong().audio.duration)
+                t.getCurrentSong().audio.currentTime = Math.max(t.getCurrentSong().audio.currentTime + n, t.getCurrentSong().audioBuffer?.duration)
             }
             ], ["seekto", function(e) {
                 t.getCurrentSong().audio.currentTime = e.seekTime
