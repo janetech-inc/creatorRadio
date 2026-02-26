@@ -776,7 +776,7 @@
                 }
 
                 if(dispatch) {
-                    handleInternalPlay(song);
+                    this.handleInternalPlay(song);
                 }
             } else {
                 song.shouldPlay = true;  
@@ -797,7 +797,7 @@
             if(dispatch) {
                 const pauseEvent = new Event('pause', { bubbles: true, cancelable: true })
                // song.audio.dispatchEvent(pauseEvent);
-                handleInternalPause(song);
+                this.handleInternalPause(song);
                 
             }
 
