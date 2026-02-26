@@ -15,17 +15,6 @@
     let isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-    const mediaDestination = audioContext.createMediaStreamDestination();
-
-    const hiddenVideo = document.createElement('video');
-    hiddenVideo.setAttribute('playsinline', '');
-    hiddenVideo.style.display = 'none';
-    hiddenVideo.srcObject = mediaDestination.stream;
-    document.body.appendChild(hiddenVideo);
-
-// Required for iOS
-hiddenVideo.muted = false;
-
     var r = {
         autoplay: !0,
         crossfadeDuration: 2 // seconds for fade in/out
@@ -39,13 +28,12 @@ hiddenVideo.muted = false;
         this.$parentElem,
         this.audio = new Audio,
         this.audio.crossOrigin = "anonymous";
-       // this.audio.preload = "auto";
-        //var l = n.createElement("source");
-        //l.setAttribute("src", e),
-        //a && (a = a.replace("\\", "/"),
-        //l.setAttribute("type", a)),
-     //   this.audio.append(l),
-        this.url = e;
+        this.audio.preload = "auto";
+        var l = n.createElement("source");
+        l.setAttribute("src", e),
+        a && (a = a.replace("\\", "/"),
+        l.setAttribute("type", a)),
+        this.audio.append(l),
         this.title = "",
         this.artist = "",
         this.album = "",
@@ -96,7 +84,23 @@ hiddenVideo.muted = false;
             return audioContext;
         }
         ,   
+        this.audio.addEventListener("timeupdate", function(e) {
+            if (t.isDragging)
+                return !1;
+            var n = t.getCurrentSong().audio.currentTime
+              , i = t.getCurrentSong().audio.duration;
+            t.updateSongDisplayTime(n, i)
 
+              // Start crossfade when approaching end
+            const fadeBeforeEnd = t.settings.crossfadeDuration || 2;
+            if (i && n >= i - fadeBeforeEnd && !t._fadeStarted) {
+                t._fadeStarted = true;
+                t.playNextSong(false);
+            }
+             else {
+                        t.preloadSong();
+                    }
+        }),
         this.audio.addEventListener("volumechange", function(e) {
             var n = 100 * e.srcElement.volume;
             t.$volumeBar.width(n + "%")
@@ -106,10 +110,10 @@ hiddenVideo.muted = false;
             t.targetSets[u.targetSetId] && t.targetSets[u.targetSetId].removeClass("is-buffering"),
             t.setPlayerState("playing", u),
             "mediaSession"in navigator && (navigator.mediaSession.playbackState = "playing")
-             if (audioContext.state === "suspended") {
-                audioContext.resume();
-              }
 
+     
+            
+            
             if (true) {
                 clearInterval(t._iosTimer);
                 t._iosTimer = setInterval(() => {
@@ -154,8 +158,8 @@ hiddenVideo.muted = false;
             if (isIOS && t._iosTimer) clearInterval(t._iosTimer);
         }), 
         this.audio.addEventListener("loadedmetadata", function() {
-            var e = parseInt(u.audioBuffer?.duration / 60, 10)
-              , n = parseInt(u.audioBuffer?.duration % 60);
+            var e = parseInt(u.audio.duration / 60, 10)
+              , n = parseInt(u.audio.duration % 60);
             n = n >= 10 ? n : "0" + n,
             u.durationString = e + ":" + n,
             u.$parentElem && u.$parentElem.find('[tmplayer-interaction="populate-duration"]').text(u.durationString),
@@ -270,60 +274,11 @@ hiddenVideo.muted = false;
             this.setCurrentSong(currentSongIndex);
 
             
-            document.addEventListener("touchstart", function unlockIOSAudio() {
-                if (audioContext.state !== "running") {
-                    audioContext.resume();
-                }
-            
-                // iOS silent switch unlock
-                const buffer = audioContext.createBuffer(1, 1, 22050);
-                const source = audioContext.createBufferSource();
-                source.buffer = buffer;
-              //  source.connect(audioContext.destination);
-                source.connect(mediaDestination);
-                source.start(0);
-            
-            }, { once: true });
+            document.addEventListener("touchstart", () => {
+                     audioContext.resume(), { once: true };
+                   // if (!this._iosUnlocked) this.unlockAudioContext();
+                }, { once: true });
            
-        },
-
-        handleInternalPause: function(song) {
-            this.setPlayerState("paused", song),
-            "mediaSession"in navigator && (navigator.mediaSession.playbackState = "paused")
-            if (this._iosTimer) clearInterval(this._iosTimer);
-        },
-        handleInternalPlay: function(song) {
-            this.targetSets[song.targetSetId] && this.targetSets[song.targetSetId].removeClass("is-buffering"),
-            this.setPlayerState("playing", song),
-            "mediaSession"in navigator && (navigator.mediaSession.playbackState = "playing")
-             if (audioContext.state === "suspended") {
-                audioContext.resume();
-              }
-
-                clearInterval(this._iosTimer);
-                this._iosTimer = setInterval(() => {
-
-                    if (this.isDragging || this.getPlayerState() == "paused") return;
-                  
-                    const currentTime = Math.min(
-                        audioContext.currentTime - (this.getCurrentSong().startTime || 0 ) + this.getCurrentSong().offset,
-                        this.getCurrentSong().audioBuffer?.duration || 0
-                    );
-                    
-                    var n = currentTime
-                      , i =  this.getCurrentSong().audioBuffer?.duration || 0;
-                    this.updateSongDisplayTime(n, i)
-        
-                    const fadeBeforeEnd =  this.getCurrentSong().fadeOutTime || this.settings.crossfadeDuration || 2;
-                    if (currentTime >= (this.getCurrentSong().audioBuffer?.duration ?? Infinity) - fadeBeforeEnd) {
-                        if (this._fadeStarted) return;
-                        this._fadeStarted = true;
-                        this.playNextSong(false);
-                    } else {
-                        this.preloadSong(this.getNextSong(),0);
-                    }
-                }, 200);
- 
         },
 
         preloadPlayCurrentSong(fadeTime) {
@@ -331,7 +286,7 @@ hiddenVideo.muted = false;
             const player = this;
             if (!song || song.audioBuffer) player.playSong(song, 0, song.offset || 0, true); // already preloaded
         
-            fetch(song.url)
+            fetch(song.audio.currentSrc)
                 .then(res => res.arrayBuffer())
                 .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
                 .then(buffer => {
@@ -366,7 +321,7 @@ hiddenVideo.muted = false;
             
             song.preloading = true;
         
-            fetch(song.url)
+            fetch(song.audio.currentSrc)
                 .then(res => res.arrayBuffer())
                 .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
                 .then(buffer => {
@@ -397,25 +352,12 @@ hiddenVideo.muted = false;
             this.getCurrentSong().audio.volume = t
         },
         playCurrentSong: function() {
-            // 🔥 iOS silent switch fix
-            if (hiddenVideo.paused) {
-                hiddenVideo.play().catch(() => {});
-            }
-        
-            e.truePlayerManager.activePlayer && e.truePlayerManager.activePlayer != this && e.truePlayerManager.activePlayer.pauseCurrentSong();
-        
-            this.pauseButton.show();
-            this.playButton.hide();
-        
-            this.getCurrentSong().audio.volume = this.getVolume();
-        
-            e.truePlayerManager.activePlayer = this;
-        
-            this.settings.crossfadeDuration = this.fadeTime(
-                this.getCurrentSong().type,
-                this.getNextSong().type
-            );
-        
+            e.truePlayerManager.activePlayer && e.truePlayerManager.activePlayer != this && e.truePlayerManager.activePlayer.pauseCurrentSong(),
+            this.pauseButton.show(),
+            this.playButton.hide(),
+            this.getCurrentSong().audio.volume = this.getVolume(),
+            e.truePlayerManager.activePlayer = this,
+            this.settings.crossfadeDuration = this.fadeTime( this.getCurrentSong().type, this.getNextSong().type);
             this.preloadPlayCurrentSong(this.settings.crossfadeDuration);
             this.setPlayerState("playing", this.getCurrentSong());
         },
@@ -482,12 +424,12 @@ hiddenVideo.muted = false;
         initProgressBarEvents: function() {
             var n = this;
             n.$progressBarWrapper.on("touchstart", function(i) {
-               if (i.preventDefault(),
-                !n.getCurrentSong().audioBuffer)
-                return !1;
+                if (i.preventDefault(),
+                0 == n.getCurrentSong().audio.readyState)
+                    return !1;
                 n.isDragging = !0;
                 var r = n.scrubSong(i)
-                  , a = n.getCurrentSong().audioBuffer?.duration;
+                  , a = n.getCurrentSong().audio.duration;
                 n.updateSongDisplayTime(r, a),
                 t(e).on("touchmove.trueAudioPlayer", function(t) {
                     var e = n.scrubSong(t);
@@ -501,12 +443,12 @@ hiddenVideo.muted = false;
                 })
             }),
             n.$progressBarWrapper.on("mousedown", function(i) {
-                 if (i.preventDefault(),
-                    !n.getCurrentSong().audioBuffer)
+                if (i.preventDefault(),
+                0 == n.getCurrentSong().audio.readyState)
                     return !1;
                 n.isDragging = !0;
                 var r = n.scrubSong(i)
-                  , a = n.getCurrentSong().audioBuffer?.duration;
+                  , a = n.getCurrentSong().audio.duration;
                 n.updateSongDisplayTime(r, a),
                 t(e).on("mousemove.trueAudioPlayer", function(t) {
                     var e = n.scrubSong(t);
@@ -548,7 +490,7 @@ hiddenVideo.muted = false;
               , n = this.$progressBarWrapper.width()
               , i = (e - this.$progressBarWrapper.offset().left) / n;
             i < 0 ? i = 0 : i > 1 && (i = 1);
-            var r = this.getCurrentSong().audioBuffer?.duration * (i = i < 0 ? 0 : i);
+            var r = this.getCurrentSong().audio.duration * (i = i < 0 ? 0 : i);
             return this.tempCurrentTime = r,
             r
         },
@@ -751,7 +693,7 @@ hiddenVideo.muted = false;
             const rawPos  = baseOffset + Math.max(0, elapsed);
         
             const duration =
-                this.getCurrentSong().audioBuffer?.duration ||
+                this.getCurrentSong().audio.duration ||
                 song.audioBuffer?.duration ||
                 Infinity;
         
@@ -766,7 +708,7 @@ hiddenVideo.muted = false;
             const gainNode = ctx.createGain();
             source.buffer = song.audioBuffer;
             source.connect(gainNode);
-            gainNode.connect(mediaDestination);
+            gainNode.connect(ctx.destination);
             song._bufferSource = source;
             song.gainNode = gainNode;
             song.offset = offset;
@@ -783,7 +725,8 @@ hiddenVideo.muted = false;
                 }
 
                 if(dispatch) {
-                    this.handleInternalPlay(song);
+                    const playEvent = new Event('play', { bubbles: true, cancelable: true })
+                    song.audio.dispatchEvent(playEvent);
                 }
             } else {
                 song.shouldPlay = true;  
@@ -803,9 +746,7 @@ hiddenVideo.muted = false;
 
             if(dispatch) {
                 const pauseEvent = new Event('pause', { bubbles: true, cancelable: true })
-               // song.audio.dispatchEvent(pauseEvent);
-                this.handleInternalPause(song);
-                
+                song.audio.dispatchEvent(pauseEvent);
             }
 
         },
@@ -993,7 +934,7 @@ hiddenVideo.muted = false;
             }
             ], ["seekforward", function(e) {
                 var n = e.seekOffset || 10;
-                t.getCurrentSong().audio.currentTime = Math.max(t.getCurrentSong().audio.currentTime + n, t.getCurrentSong().audioBuffer?.duration)
+                t.getCurrentSong().audio.currentTime = Math.max(t.getCurrentSong().audio.currentTime + n, t.getCurrentSong().audio.duration)
             }
             ], ["seekto", function(e) {
                 t.getCurrentSong().audio.currentTime = e.seekTime
