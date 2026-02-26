@@ -15,6 +15,17 @@
     let isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
+    const mediaDestination = audioContext.createMediaStreamDestination();
+
+    const hiddenVideo = document.createElement('video');
+    hiddenVideo.setAttribute('playsinline', '');
+    hiddenVideo.style.display = 'none';
+    hiddenVideo.srcObject = mediaDestination.stream;
+    document.body.appendChild(hiddenVideo);
+
+// Required for iOS
+hiddenVideo.muted = false;
+
     var r = {
         autoplay: !0,
         crossfadeDuration: 2 // seconds for fade in/out
@@ -268,7 +279,8 @@
                 const buffer = audioContext.createBuffer(1, 1, 22050);
                 const source = audioContext.createBufferSource();
                 source.buffer = buffer;
-                source.connect(audioContext.destination);
+              //  source.connect(audioContext.destination);
+                source.connect(mediaDestination);
                 source.start(0);
             
             }, { once: true });
@@ -386,14 +398,8 @@
         },
         playCurrentSong: function() {
             // 🔥 iOS silent switch fix
-            if (audioContext.state !== "running") {
-                audioContext.resume();
-        
-                const buffer = audioContext.createBuffer(1, 1, 22050);
-                const source = audioContext.createBufferSource();
-                source.buffer = buffer;
-                source.connect(audioContext.destination);
-                source.start(0);
+            if (hiddenVideo.paused) {
+                hiddenVideo.play().catch(() => {});
             }
         
             e.truePlayerManager.activePlayer && e.truePlayerManager.activePlayer != this && e.truePlayerManager.activePlayer.pauseCurrentSong();
@@ -760,7 +766,7 @@
             const gainNode = ctx.createGain();
             source.buffer = song.audioBuffer;
             source.connect(gainNode);
-            gainNode.connect(ctx.destination);
+            gainNode.connect(mediaDestination);
             song._bufferSource = source;
             song.gainNode = gainNode;
             song.offset = offset;
