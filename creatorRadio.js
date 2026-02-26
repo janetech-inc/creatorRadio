@@ -307,7 +307,7 @@
                         this._fadeStarted = true;
                         this.playNextSong(false);
                     } else {
-                        this.preloadSong(t.getNextSong(),0);
+                        this.preloadSong(this.getNextSong(),0);
                     }
                 }, 200);
  
