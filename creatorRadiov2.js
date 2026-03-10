@@ -678,7 +678,7 @@
         getPlaybackPosition(song) {
             if (!song || !song.audio) return 0;
             return song.audio.currentTime || 0;
-        }
+        },
         
         getPlaybackPositionv1(song) {
             if (!song) return 0;
