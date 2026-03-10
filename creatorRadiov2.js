@@ -258,6 +258,20 @@
             }, { once: true });
            
         },
+
+        unlockAllAudio() {
+            this.songs.forEach(song => {
+                try {
+                    song.audio.muted = true;
+                    song.audio.play().then(() => {
+                        song.audio.pause();
+                        song.audio.currentTime = 0;
+                        song.audio.muted = false;
+                    }).catch(()=>{});
+                } catch(e) {}
+            });
+        },
+        
         preloadPlayCurrentSong() {
             const song = this.getCurrentSong();
             if (!song) return;
@@ -345,6 +359,12 @@
             this.getCurrentSong().audio.volume = t
         },
         playCurrentSong: function() {
+
+            if (!this._audioUnlocked) {
+                this.unlockAllAudio();
+                this._audioUnlocked = true;
+            }
+
             e.truePlayerManager.activePlayer && e.truePlayerManager.activePlayer != this && e.truePlayerManager.activePlayer.pauseCurrentSong(),
             this.pauseButton.show(),
             this.playButton.hide(),
