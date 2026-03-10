@@ -15,6 +15,24 @@
     let isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
+    audioContext.onstatechange = () => {
+                
+                    if (audioContext.state === 'interrupted') {
+                        console.log('AudioContext was interrupted by the UA.');
+
+                        // Handle the pause in your application logic
+                      } 
+                    else if (audioContext.state === 'running') {
+                        console.log('AudioContext is running.');
+                        // Resume your application logic
+                    }
+                    // iOS Safari fix
+                    else if (audioContext.state === 'suspended') {
+                        console.log('AudioContext was suspended by the UA.');
+              
+                    }
+                };
+
     var r = {
         autoplay: !0,
         crossfadeDuration: 2 // seconds for fade in/out
@@ -33,6 +51,8 @@
         l.setAttribute("src", e),
         a && (a = a.replace("\\", "/"),
         l.setAttribute("type", a)),
+        this.audio.setAttribute("playsinline", "true");
+        this.audio.setAttribute("webkit-playsinline", "true");
         this.audio.append(l),
         this.title = "",
         this.artist = "",
@@ -45,23 +65,7 @@
         this._thumbnailBlobUrl = "",
         this._isCrossfading = false,
         
-            audioContext.onstatechange = () => {
-                
-                    if (audioContext.state === 'interrupted') {
-                        console.log('AudioContext was interrupted by the UA.');
-
-                        // Handle the pause in your application logic
-                      } 
-                    else if (audioContext.state === 'running') {
-                        console.log('AudioContext is running.');
-                        // Resume your application logic
-                    }
-                    // iOS Safari fix
-                    else if (audioContext.state === 'suspended') {
-                        console.log('AudioContext was suspended by the UA.');
-              
-                    }
-                };
+            
         
 
         this.getThumbnail = function() {
@@ -85,21 +89,24 @@
         }
         ,   
         this.audio.addEventListener("timeupdate", function(e) {
-            if (t.isDragging)
-                return !1;
-            var n = t.getCurrentSong().audio.currentTime
-              , i = t.getCurrentSong().audio.duration;
-            t.updateSongDisplayTime(n, i)
-
-              // Start crossfade when approaching end
-            const fadeBeforeEnd = t.settings.crossfadeDuration || 2;
-            if (i && n >= i - fadeBeforeEnd && !t._fadeStarted) {
-                t._fadeStarted = true;
-                t.playNextSong(false);
-            }
-             else {
-                        t.preloadSong();
+            
+                    if (t.isDragging || t.getPlayerState() == "paused") return;
+                  
+                   const song = t.getCurrentSong();
+                const currentTime = song.audio.currentTime;
+                const duration = song.audio.duration || 0;
+                
+                t.updateSongDisplayTime(currentTime, duration);
+                    const fadeBeforeEnd =  song.fadeOutTime || t.settings.crossfadeDuration || 2;
+                    if (currentTime >= duration - fadeBeforeEnd)
+                        if (t._fadeStarted) return;
+                        t._fadeStarted = true;
+                        t.playNextSong(false);
+                    } else {
+                        t.preloadSong(t.getNextSong());
                     }
+
+            
         }),
         this.audio.addEventListener("volumechange", function(e) {
             var n = 100 * e.srcElement.volume;
@@ -110,35 +117,6 @@
             t.targetSets[u.targetSetId] && t.targetSets[u.targetSetId].removeClass("is-buffering"),
             t.setPlayerState("playing", u),
             "mediaSession"in navigator && (navigator.mediaSession.playbackState = "playing")
-
-     
-            
-            
-            if (true) {
-                clearInterval(t._iosTimer);
-                t._iosTimer = setInterval(() => {
-
-                    if (t.isDragging || t.getPlayerState() == "paused") return;
-                  
-                    const currentTime = Math.min(
-                        audioContext.currentTime - (t.getCurrentSong().startTime || 0 ) + t.getCurrentSong().offset,
-                        t.getCurrentSong().audioBuffer?.duration || 0
-                    );
-                    
-                    var n = currentTime
-                      , i =  t.getCurrentSong().audioBuffer?.duration || 0;
-                    t.updateSongDisplayTime(n, i)
-        
-                    const fadeBeforeEnd =  t.getCurrentSong().fadeOutTime || t.settings.crossfadeDuration || 2;
-                    if (currentTime >= (t.getCurrentSong().audioBuffer?.duration ?? Infinity) - fadeBeforeEnd) {
-                        if (t._fadeStarted) return;
-                        t._fadeStarted = true;
-                        t.playNextSong(false);
-                    } else {
-                        t.preloadSong(t.getNextSong(),0);
-                    }
-                }, 200);
-            }
         }),
         this.audio.addEventListener("pause", function() {
             t.setPlayerState("paused", u),
@@ -273,15 +251,21 @@
             const currentSongIndex = savedIndex !== null ? Number(savedIndex) : 0;
             this.setCurrentSong(currentSongIndex);
 
-            
-            document.addEventListener("touchstart", () => {
-                     audioContext.resume(), { once: true };
-                   // if (!this._iosUnlocked) this.unlockAudioContext();
-                }, { once: true });
+           document.addEventListener("touchstart", () => {
+                if (audioContext.state !== "running") {
+                    audioContext.resume();
+                }
+            }, { once: true });
            
         },
+        preloadPlayCurrentSong() {
+            const song = this.getCurrentSong();
+            if (!song) return;
+        
+            this.playSong(song, 0, song.offset ?? 0, true);
+        },
 
-        preloadPlayCurrentSong(fadeTime) {
+        preloadPlayCurrentSongv1(fadeTime) {
             const song = this.getCurrentSong();
             const player = this;
             if (!song || song.audioBuffer) player.playSong(song, 0, song.offset || 0, true); // already preloaded
@@ -298,8 +282,17 @@
                 })
                 .catch(err => console.warn("Failed to preload song:", err));
         },
+
+        preloadSong(song) {
+            if (!song) return;
         
-        preloadSong(song, depth=0) {
+            // force browser preload
+            if (song.audio && song.audio.preload !== "auto") {
+                song.audio.preload = "auto";
+            }
+        },
+
+        preloadSongv1(song, depth=0) {
             const player = this;
             if (!song || song.preloading) return; // already preloading
 
@@ -358,7 +351,7 @@
             this.getCurrentSong().audio.volume = this.getVolume(),
             e.truePlayerManager.activePlayer = this,
             this.settings.crossfadeDuration = this.fadeTime( this.getCurrentSong().type, this.getNextSong().type);
-            this.preloadPlayCurrentSong(this.settings.crossfadeDuration);
+            this.preloadPlayCurrentSong();
             this.setPlayerState("playing", this.getCurrentSong());
         },
         stopCurrentSong: function() {
@@ -507,12 +500,12 @@
             
               const name =
                 song.name ||
-                song.id 
+                song.id || 
                 'unknown-track';
             
               // try to pull duration from common fields
               const duration =
-                song.audioBuffer?.duration ||
+                song.audio?.duration ||
                 null;
             
               return duration
@@ -581,7 +574,7 @@
             type,
             song: this.getSongLabel(song),
             preloading: song.preloading,
-            audioBigger: song._bufferSource,
+            audioElement: song.audio,
             startTime,
             fadeDuration,
             rampType,
@@ -676,13 +669,18 @@
           const startedAt = song.startTime || audioContext.currentTime;      // audioContext.currentTime when started
           const offset = song.offset || this.tempCurrentTime;               // seconds into the track (resume)
           const duration =
-                song.audioBuffer?.duration ||
                 song.audio?.duration ||
                 0;
         
           return startedAt + (duration - offset);
         },
+
         getPlaybackPosition(song) {
+            if (!song || !song.audio) return 0;
+            return song.audio.currentTime || 0;
+        }
+        
+        getPlaybackPositionv1(song) {
             if (!song) return 0;
         
             const ctx = audioContext;
@@ -694,13 +692,54 @@
         
             const duration =
                 this.getCurrentSong().audio.duration ||
-                song.audioBuffer?.duration ||
                 Infinity;
         
             return Math.min(rawPos, duration);
         },
+
+        playSong: function (song, fadeTime = 2, offset = 0, dispatch = false) {
+
+            const ctx = audioContext;
         
-        playSong: function(song, fadeTime = 2, offset = 0, dispatch=false) {
+            this.stopSong(song, false);
+        
+            // create gain
+        
+            if (!song.mediaSource) {
+                song.mediaSource = ctx.createMediaElementSource(song.audio);
+            }
+    
+            if (!song.gainNode) {
+                song.gainNode = ctx.createGain();
+                song.mediaSource.connect(song.gainNode);
+                song.gainNode.connect(ctx.destination);
+            }
+
+            song.audio.currentTime = offset ?? 0;
+            song.audio.volume = 1;
+        
+            const startTime = ctx.currentTime;
+            song.startTime = startTime;
+        
+           const playPromise = song.audio.play();
+
+            if (fadeTime > 0) {
+                this.fadeIn(song.type, song, startTime, fadeTime);
+            } else {
+                song.gainNode.gain.setValueAtTime(1, startTime);
+            }
+        
+            if (dispatch) {
+                const playEvent = new Event('play', { bubbles: true, cancelable: true });
+                song.audio.dispatchEvent(playEvent);
+            }
+
+              if (playPromise && typeof playPromise.catch === "function") {
+                playPromise.catch(err => console.warn("Playback failed:", err));
+            }
+        },
+        
+        playSongv1: function(song, fadeTime = 2, offset = 0, dispatch=false) {
 
             this.stopSong(song, false);
             const ctx = audioContext;
@@ -734,7 +773,27 @@
     
         },
 
-        stopSong: function(song, dispatch=false) {
+        stopSong: function (song, dispatch = false) {
+    
+             if (!song) return;
+
+            if (song.audio) {
+                song.audio.pause();
+            }
+        
+            if (song.gainNode) {
+                const now = audioContext.currentTime;
+                song.gainNode.gain.cancelScheduledValues(now);
+                song.gainNode.gain.setValueAtTime(0, now);
+            }
+
+            if (dispatch) {
+                const pauseEvent = new Event('pause', { bubbles: true, cancelable: true });
+                song.audio.dispatchEvent(pauseEvent);
+            }
+        },
+
+        stopSongv1: function(song, dispatch=false) {
           if (song._bufferSource) {
                if (song.started) {
                 song._bufferSource.stop();
