@@ -701,7 +701,7 @@
 
             const ctx = audioContext;
         
-            this.stopSong(song, false);
+            //this.stopSong(song, false);
         
             // create gain
         
