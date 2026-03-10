@@ -98,7 +98,7 @@
                 
                 t.updateSongDisplayTime(currentTime, duration);
                     const fadeBeforeEnd =  song.fadeOutTime || t.settings.crossfadeDuration || 2;
-                    if (currentTime >= duration - fadeBeforeEnd)
+                    if (currentTime >= duration - fadeBeforeEnd) {
                         if (t._fadeStarted) return;
                         t._fadeStarted = true;
                         t.playNextSong(false);
