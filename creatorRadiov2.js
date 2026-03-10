@@ -704,9 +704,9 @@
             //this.stopSong(song, false);
 
 
-    if (ctx.state !== "running") {
-        ctx.resume();
-    }
+            if (ctx.state !== "running") {
+                ctx.resume();
+            }
         
             // create gain
         
