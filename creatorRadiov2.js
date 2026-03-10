@@ -814,7 +814,40 @@
             }
 
         },
+
         playNextSong: function(skip=false) {
+
+            if (this.songs.length <= 1) return false;
+        
+            const currentSong = this.getCurrentSong();
+            const currentIndex = this.getCurrentSongIndex();
+            const nextIndex = this.songs[currentIndex + 1] ? currentIndex + 1 : 0;
+            const nextSong = this.getSongAt(nextIndex);
+        
+            currentSong.fadeOutTime = this.fadeTime(currentSong.type, nextSong.type);
+            const fadeTime = currentSong.fadeOutTime || this.settings.crossfadeDuration || 2;
+        
+            if(skip) {
+                this.stopSong(currentSong, false);
+            } else {
+                this.fadeOut(currentSong.type, currentSong, fadeTime);
+            }
+        
+            // IMPORTANT: switch index first
+            this.setCurrentSong(nextIndex, false);
+        
+            // then start playback
+            this.playSong(nextSong, fadeTime, 0, true);
+        
+            setTimeout(() => {
+                this.stopSong(currentSong,false);
+                this.setPlayerState("playing", nextSong);
+                this._isCrossfading = false;
+                this._fadeStarted = false;
+            }, Math.max(fadeTime, 1.5) * 1000);
+        },
+        
+        playNextSongv1: function(skip=false) {
             this.tempCurrentTime = 0;
             
            if (this.songs.length <= 1) return false;
