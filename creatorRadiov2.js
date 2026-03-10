@@ -702,6 +702,11 @@
             const ctx = audioContext;
         
             //this.stopSong(song, false);
+
+
+    if (ctx.state !== "running") {
+        ctx.resume();
+    }
         
             // create gain
         
