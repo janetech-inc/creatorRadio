@@ -725,7 +725,10 @@
         
             const startTime = ctx.currentTime;
             song.startTime = startTime;
-        
+
+            song.audio.muted = false;
+            song.audio.playsInline = true;
+            song.audio.setAttribute("playsinline", "");
            const playPromise = song.audio.play();
 
             if (fadeTime > 0) {
