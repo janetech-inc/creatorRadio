@@ -560,6 +560,8 @@
                 const now = audioContext.currentTime;
                 this.nextDeck.gainNode.gain.cancelScheduledValues(now);
                 this.nextDeck.gainNode.gain.setValueAtTime(0, now);
+                  // 🔧 IMPORTANT: clear preload state
+                this.nextDeck.song = null;
             }
 
             if (song) {
