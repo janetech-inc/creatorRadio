@@ -1,14 +1,13 @@
 /**
  * @license
+ * Creator Radio Audio Player 1.0.3 (two-deck iOS-safe patch)
  * True Audio Player 1.3.1 (two-deck iOS-safe patch)
- * Audio player plugin for creating robust audio player solutions
- * https://upliftwebdesign.com/true-audio-player
  *
- * Copyright 2024 Uplift Web Design LLC
+ * Copyright 2026 Misty Mountain Inc
  *
  * Released under the GNU General Public License v3.0 License
  *
- * Released on: December 30, 2024
+ * Released on: December 30, 2026
  */
 !function ($, window, document, undefined) {
 
@@ -53,6 +52,8 @@
         this.audio.preload = "metadata";
         this.audio.setAttribute("playsinline", "true");
         this.audio.setAttribute("webkit-playsinline", "true");
+        this.audio.controls = false;
+        this.audio.loop = false;
 
         const source = document.createElement("source");
         source.setAttribute("src", url);
@@ -169,6 +170,16 @@
             self.pauseButton.hide();
             self.$progressBar.width("0%");
             self.$volumeBar.width("100%");
+
+             document.addEventListener("visibilitychange", () => {
+            
+                if (document.hidden) {
+                    if (audioContext.state === "suspended") {
+                        audioContext.resume();
+                    }
+                }
+            
+            });
 
             // --- TWO DECK ENGINE ---
             self.createDeck = () => {
