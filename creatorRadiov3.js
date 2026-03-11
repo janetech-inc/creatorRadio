@@ -1,14 +1,12 @@
 /**
  * @license
- * True Audio Player 1.3.1 (two-deck iOS-safe patch)
+ * Creator Radio Audio Player 1.0.3 (two-deck iOS-safe patch)
  * Audio player plugin for creating robust audio player solutions
- * https://upliftwebdesign.com/true-audio-player
- *
- * Copyright 2024 Uplift Web Design LLC
+ * https://creatorradioai.com
  *
  * Released under the GNU General Public License v3.0 License
  *
- * Released on: December 30, 2024
+ * Released on: December 30, 2025
  */
 !function ($, window, document, undefined) {
 
