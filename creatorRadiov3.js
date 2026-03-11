@@ -973,7 +973,7 @@
 
             setTimeout(() => {
 
-                if (this.getPlayerState() === "paused") return;
+               // if (this.getPlayerState() === "paused") return;
 
                 outgoingDeck.audio.pause();
                 outgoingDeck.gainNode.gain.setValueAtTime(0, audioContext.currentTime);
