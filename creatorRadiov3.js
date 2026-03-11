@@ -833,7 +833,7 @@
                     rampType = "linear";
                     targetValue = 0.001;
                     endTime = startTime + fadeDuration;
-                    g.linearRampToValueAtTime(0, startTime + fadeDuration);
+                    g.linearRampToValueAtTime(targetValue, startTime + fadeDuration);
             }
 
             this.logFadeEvent("fadeOut", {
@@ -1022,7 +1022,14 @@
                         navigator.mediaSession.metadata = new MediaMetadata({
                             title: song.title,
                             artist: song.artist,
-                            album: song.album
+                            album: song.album,
+                            artwork: [
+                                {
+                                    src: song.getThumbnail?.() || "",
+                                    sizes: "512x512",
+                                    type: "image/png"
+                                }
+                            ]
                         });
                     }
 
