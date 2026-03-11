@@ -502,10 +502,9 @@
                 const next = self.getNextSong() || current;
                 self.settings.crossfadeDuration = self.fadeTime(current.type, next.type);
 
-                self.preloadSong(next);              // ensure next deck is ready
-                self.preloadPlayCurrentSong();       // start current deck
-                self.preloadSong(self.getNextSong()); // rebuild pipeline after resume
-
+                self.preloadSong(next);            
+                self.preloadPlayCurrentSong();       
+            
                 self.setPlayerState("playing", current);
             };
 
@@ -560,8 +559,6 @@
                 const now = audioContext.currentTime;
                 this.nextDeck.gainNode.gain.cancelScheduledValues(now);
                 this.nextDeck.gainNode.gain.setValueAtTime(0, now);
-                  // 🔧 IMPORTANT: clear preload state
-                this.nextDeck.song = null;
             }
 
             if (song) {
