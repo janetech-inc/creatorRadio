@@ -486,17 +486,6 @@
             const self = this;
 
             self.unlockAudioContext();
-            if (this.getPlayerState() === "paused" && this.activeDeck?.song) {
-
-                const p = this.activeDeck.audio.play();
-                if (p && p.catch) p.catch(()=>{});
-            
-                this.pauseButton.show();
-                this.playButton.hide();
-            
-                this.setPlayerState("playing", this.activeDeck.song);
-                return;
-            }
 
             const continuePlay = function () {
                 window.truePlayerManager.activePlayer && window.truePlayerManager.activePlayer !== self && window.truePlayerManager.activePlayer.pauseCurrentSong();
@@ -555,10 +544,7 @@
             this.pauseButton.hide();
             this.playButton.show();
             this._fadeStarted = false;
-            this._isCrossfading = false;
-             // 🔧 ensure both decks stop
-            this.deckA.audio.pause();
-            this.deckB.audio.pause();
+            this._isCrossfading = false
 
             if (window.truePlayerManager.activePlayer === this) {
                 window.truePlayerManager.activePlayer = null;
