@@ -1,12 +1,14 @@
 /**
  * @license
- * Creator Radio Audio Player 1.0.3 (two-deck iOS-safe patch)
+ * True Audio Player 1.3.1 (two-deck iOS-safe patch)
  * Audio player plugin for creating robust audio player solutions
- * https://creatorradioai.com
+ * https://upliftwebdesign.com/true-audio-player
+ *
+ * Copyright 2024 Uplift Web Design LLC
  *
  * Released under the GNU General Public License v3.0 License
  *
- * Released on: December 30, 2025
+ * Released on: December 30, 2024
  */
 !function ($, window, document, undefined) {
 
@@ -14,7 +16,13 @@
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
     audioContext.onstatechange = () => {
-        console.log("AudioContext state:", audioContext.state);
+        if (audioContext.state === "interrupted") {
+            console.log("AudioContext was interrupted by the UA.");
+        } else if (audioContext.state === "running") {
+            console.log("AudioContext is running.");
+        } else if (audioContext.state === "suspended") {
+            console.log("AudioContext was suspended by the UA.");
+        }
     };
 
     const defaults = {
@@ -45,10 +53,6 @@
         this.audio.preload = "metadata";
         this.audio.setAttribute("playsinline", "true");
         this.audio.setAttribute("webkit-playsinline", "true");
-        
-        // important for background playback
-        this.audio.controls = false;
-        this.audio.loop = false;
 
         const source = document.createElement("source");
         source.setAttribute("src", url);
@@ -165,16 +169,6 @@
             self.pauseButton.hide();
             self.$progressBar.width("0%");
             self.$volumeBar.width("100%");
-
-            document.addEventListener("visibilitychange", () => {
-            
-                if (document.hidden) {
-                    if (audioContext.state === "suspended") {
-                       // audioContext.resume();
-                    }
-                }
-            
-            });
 
             // --- TWO DECK ENGINE ---
             self.createDeck = () => {
@@ -367,7 +361,7 @@
                 deck.audio.src = src;
                 deck.sourceUrl = src;
                 deck.sourceType = type;
-              //  deck.audio.load();
+                deck.audio.load();
             }
 
             try {
@@ -828,7 +822,7 @@
                     rampType = "linear";
                     targetValue = 0.001;
                     endTime = startTime + fadeDuration;
-                    g.linearRampToValueAtTime(0.001, startTime + fadeDuration);
+                    g.linearRampToValueAtTime(0, startTime + fadeDuration);
             }
 
             this.logFadeEvent("fadeOut", {
@@ -1014,17 +1008,10 @@
                     }
 
                     if ("mediaSession" in navigator) {
-                         navigator.mediaSession.metadata = new MediaMetadata({
+                        navigator.mediaSession.metadata = new MediaMetadata({
                             title: song.title,
                             artist: song.artist,
-                            album: song.album,
-                            artwork: [
-                                {
-                                    src: song.getThumbnail?.() || "",
-                                    sizes: "512x512",
-                                    type: "image/png"
-                                }
-                            ]
+                            album: song.album
                         });
                     }
 
