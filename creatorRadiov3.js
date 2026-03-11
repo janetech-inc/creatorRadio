@@ -504,6 +504,8 @@
 
                 self.preloadSong(next);
                 self.preloadPlayCurrentSong();
+
+                self.setPlayerState("playing", current);
             };
 
             if (!self._decksPrimed) {
