@@ -180,7 +180,7 @@
             self.createDeck = () => {
                 const audio = new Audio();
                 audio.crossOrigin = "anonymous";
-                audio.preload = "metadata";
+                audio.preload = "auto";
                 audio.setAttribute("playsinline", "true");
                 audio.setAttribute("webkit-playsinline", "true");
 
@@ -367,7 +367,7 @@
                 deck.audio.src = src;
                 deck.sourceUrl = src;
                 deck.sourceType = type;
-                deck.audio.load();
+              //  deck.audio.load();
             }
 
             try {
