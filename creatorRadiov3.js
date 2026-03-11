@@ -42,7 +42,7 @@
 
         this.audio = new Audio();
         this.audio.crossOrigin = "anonymous";
-        this.audio.preload = "auto";
+        this.audio.preload = "metadata";
         this.audio.setAttribute("playsinline", "true");
         this.audio.setAttribute("webkit-playsinline", "true");
         
@@ -180,7 +180,7 @@
             self.createDeck = () => {
                 const audio = new Audio();
                 audio.crossOrigin = "anonymous";
-                audio.preload = "auto";
+                audio.preload = "metadata";
                 audio.setAttribute("playsinline", "true");
                 audio.setAttribute("webkit-playsinline", "true");
 
