@@ -170,7 +170,7 @@
             
                 if (document.hidden) {
                     if (audioContext.state === "suspended") {
-                        audioContext.resume();
+                       // audioContext.resume();
                     }
                 }
             
@@ -828,7 +828,7 @@
                     rampType = "linear";
                     targetValue = 0.001;
                     endTime = startTime + fadeDuration;
-                    g.linearRampToValueAtTime(0, startTime + fadeDuration);
+                    g.linearRampToValueAtTime(0.001, startTime + fadeDuration);
             }
 
             this.logFadeEvent("fadeOut", {
