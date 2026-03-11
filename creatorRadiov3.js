@@ -295,7 +295,8 @@
                 if (deck !== self.activeDeck) return;
                 if (self.isDragging || self.getPlayerState() === "paused") return;
                 if (!deck.song) return;
-
+                if (deck.audio.paused) return; 
+                
                 const currentTime = deck.audio.currentTime || 0;
                 const duration = deck.audio.duration || 0;
 
@@ -485,6 +486,17 @@
             const self = this;
 
             self.unlockAudioContext();
+            if (this.getPlayerState() === "paused" && this.activeDeck?.song) {
+
+                const p = this.activeDeck.audio.play();
+                if (p && p.catch) p.catch(()=>{});
+            
+                this.pauseButton.show();
+                this.playButton.hide();
+            
+                this.setPlayerState("playing", this.activeDeck.song);
+                return;
+            }
 
             const continuePlay = function () {
                 window.truePlayerManager.activePlayer && window.truePlayerManager.activePlayer !== self && window.truePlayerManager.activePlayer.pauseCurrentSong();
@@ -542,6 +554,11 @@
 
             this.pauseButton.hide();
             this.playButton.show();
+            this._fadeStarted = false;
+            this._isCrossfading = false;
+             // 🔧 ensure both decks stop
+            this.deckA.audio.pause();
+            this.deckB.audio.pause();
 
             if (window.truePlayerManager.activePlayer === this) {
                 window.truePlayerManager.activePlayer = null;
@@ -928,7 +945,8 @@
         },
 
         playNextSong: function (skip = false) {
-            if (this.songs.length <= 1) return false;
+            if (this.songs.length <= 1) return;
+            if (this.getPlayerState() === "paused") return;
 
             const currentSong = this.getCurrentSong();
             const currentIndex = this.getCurrentSongIndex();
@@ -964,6 +982,9 @@
             }
 
             setTimeout(() => {
+
+                if (this.getPlayerState() === "paused") return;
+
                 outgoingDeck.audio.pause();
                 outgoingDeck.gainNode.gain.setValueAtTime(0, audioContext.currentTime);
 
