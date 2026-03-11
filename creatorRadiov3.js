@@ -16,13 +16,14 @@
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
     audioContext.onstatechange = () => {
-        if (audioContext.state === "interrupted") {
-            console.log("AudioContext was interrupted by the UA.");
-        } else if (audioContext.state === "running") {
-            console.log("AudioContext is running.");
-        } else if (audioContext.state === "suspended") {
-            console.log("AudioContext was suspended by the UA.");
-        }
+       
+        if (audioContext.state === "interrupted" || audioContext.state === "suspended") {
+    
+            setTimeout(() => {
+                audioContext.resume();
+            }, 200);
+
+    }
     };
 
     const defaults = {
@@ -50,9 +51,13 @@
 
         this.audio = new Audio();
         this.audio.crossOrigin = "anonymous";
-        this.audio.preload = "metadata";
+        thia.audio.preload = "auto";
         this.audio.setAttribute("playsinline", "true");
         this.audio.setAttribute("webkit-playsinline", "true");
+        
+        // important for background playback
+        this.audio.controls = false;
+        this.audio.loop = false;
 
         const source = document.createElement("source");
         source.setAttribute("src", url);
@@ -169,6 +174,16 @@
             self.pauseButton.hide();
             self.$progressBar.width("0%");
             self.$volumeBar.width("100%");
+
+            document.addEventListener("visibilitychange", () => {
+            
+                if (document.hidden) {
+                    if (audioContext.state === "suspended") {
+                        audioContext.resume();
+                    }
+                }
+            
+            });
 
             // --- TWO DECK ENGINE ---
             self.createDeck = () => {
@@ -1008,10 +1023,17 @@
                     }
 
                     if ("mediaSession" in navigator) {
-                        navigator.mediaSession.metadata = new MediaMetadata({
-                            title: song.title,
-                            artist: song.artist,
-                            album: song.album
+                    navigator.mediaSession.metadata = new MediaMetadata({
+                            title: e.title,
+                            artist: e.artist,
+                            album: e.album,
+                            artwork: [
+                                {
+                                    src: e.getThumbnail(),
+                                    sizes: "512x512",
+                                    type: "image/png"
+                                }
+                            ]
                         });
                     }
 
