@@ -486,7 +486,8 @@
             const self = this;
 
             self.unlockAudioContext();
-
+            self.setPlayerState("playing", current);
+            
             const continuePlay = function () {
                 window.truePlayerManager.activePlayer && window.truePlayerManager.activePlayer !== self && window.truePlayerManager.activePlayer.pauseCurrentSong();
 
@@ -504,7 +505,6 @@
 
                 self.preloadSong(next);
                 self.preloadPlayCurrentSong();
-                self.setPlayerState("playing", current);
             };
 
             if (!self._decksPrimed) {
