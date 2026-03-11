@@ -486,7 +486,6 @@
             const self = this;
 
             self.unlockAudioContext();
-            self.setPlayerState("playing", current);
             
             const continuePlay = function () {
                 window.truePlayerManager.activePlayer && window.truePlayerManager.activePlayer !== self && window.truePlayerManager.activePlayer.pauseCurrentSong();
@@ -544,7 +543,7 @@
             this.pauseButton.hide();
             this.playButton.show();
             this._fadeStarted = false;
-            this._isCrossfading = false
+            this._isCrossfading = false;
 
             if (window.truePlayerManager.activePlayer === this) {
                 window.truePlayerManager.activePlayer = null;
