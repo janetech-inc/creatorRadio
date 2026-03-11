@@ -259,19 +259,40 @@
            
         },
 
-        unlockAllAudio() {
+         unlockAllAudio() {
+        
+            if (this._audioUnlocked) return;
+        
+            const ctx = audioContext;
+            if (ctx.state !== "running") {
+                ctx.resume();
+            }
+        
+            const silent = "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAA";
+        
             this.songs.forEach(song => {
                 try {
-                    song.audio.muted = true;
-                    song.audio.play().then(() => {
-                        song.audio.pause();
-                        song.audio.currentTime = 0;
-                        song.audio.muted = false;
-                    }).catch(()=>{});
-                } catch(e) {}
-            });
-        },
+                    const audio = song.audio;
         
+                    const originalSrc = audio.src;
+        
+                    audio.src = silent;
+                    audio.muted = true;
+        
+                    audio.play()
+                        .then(() => {
+                            audio.pause();
+                            audio.src = originalSrc;
+                            audio.muted = false;
+                        })
+                        .catch(()=>{});
+        
+                } catch(e){}
+            });
+        
+            this._audioUnlocked = true;
+        }
+                
         preloadPlayCurrentSong() {
             const song = this.getCurrentSong();
             if (!song) return;
