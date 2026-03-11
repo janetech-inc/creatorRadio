@@ -1,7 +1,6 @@
 /**
  * @license
- * Creator Radio Audio Player 1.0.3 (two-deck iOS-safe patch)
- * True Audio Player 1.3.1 (two-deck iOS-safe patch)
+ * Creator Radio Audio Player 1.0.3
  *
  * Copyright 2026 Misty Mountain Inc
  *
