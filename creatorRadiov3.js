@@ -15,13 +15,13 @@
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
     audioContext.onstatechange = () => {
-        if (audioContext.state === "interrupted") {
-            console.log("AudioContext was interrupted by the UA.");
-        } else if (audioContext.state === "running") {
-            console.log("AudioContext is running.");
-        } else if (audioContext.state === "suspended") {
-            console.log("AudioContext was suspended by the UA.");
-        }
+         if (audioContext.state === "interrupted" || audioContext.state === "suspended") {
+    
+            setTimeout(() => {
+                audioContext.resume();
+            }, 200);
+
+    }
     };
 
     const defaults = {
