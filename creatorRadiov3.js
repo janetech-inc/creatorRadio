@@ -502,7 +502,9 @@
                 const next = self.getNextSong() || current;
                 self.settings.crossfadeDuration = self.fadeTime(current.type, next.type);
 
-                self.preloadSong(next);
+                // rebuild deck pipeline after pause
+                self.loadSongIntoDeck(self.activeDeck, current, current.offset || 0);
+                self.loadSongIntoDeck(self.nextDeck, next, 0);
                 self.preloadPlayCurrentSong();
 
                 self.setPlayerState("playing", current);
