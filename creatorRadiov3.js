@@ -1021,13 +1021,13 @@
                     }
 
                     if ("mediaSession" in navigator) {
-                    navigator.mediaSession.metadata = new MediaMetadata({
-                            title: e.title,
-                            artist: e.artist,
-                            album: e.album,
+                         navigator.mediaSession.metadata = new MediaMetadata({
+                            title: song.title,
+                            artist: song.artist,
+                            album: song.album,
                             artwork: [
                                 {
-                                    src: e.getThumbnail(),
+                                    src: song.getThumbnail?.() || "",
                                     sizes: "512x512",
                                     type: "image/png"
                                 }
