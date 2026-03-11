@@ -14,14 +14,7 @@
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
     audioContext.onstatechange = () => {
-       
-        if (audioContext.state === "interrupted" || audioContext.state === "suspended") {
-    
-            setTimeout(() => {
-                audioContext.resume();
-            }, 200);
-
-    }
+        console.log("AudioContext state:", audioContext.state);
     };
 
     const defaults = {
