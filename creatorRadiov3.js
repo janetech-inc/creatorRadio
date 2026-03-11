@@ -476,7 +476,7 @@
             self.unlockAudioContext();
 
             const continuePlay = function () {
-                e.truePlayerManager.activePlayer && e.truePlayerManager.activePlayer !== self && e.truePlayerManager.activePlayer.pauseCurrentSong();
+                window.truePlayerManager.activePlayer && window.truePlayerManager.activePlayer !== self && window.truePlayerManager.activePlayer.pauseCurrentSong();
 
                 self.pauseButton.show();
                 self.playButton.hide();
@@ -484,7 +484,7 @@
                 if (self.deckA) self.deckA.audio.volume = self.getVolume();
                 if (self.deckB) self.deckB.audio.volume = self.getVolume();
 
-                e.truePlayerManager.activePlayer = self;
+                window.truePlayerManager.activePlayer = self;
 
                 const current = self.getCurrentSong();
                 const next = self.getNextSong() || current;
@@ -532,9 +532,9 @@
             this.pauseButton.hide();
             this.playButton.show();
 
-            if (e.truePlayerManager.activePlayer === this) {
-                e.truePlayerManager.activePlayer = null;
-                e.truePlayerManager.previouslyActivePlayer = this;
+            if (window.truePlayerManager.activePlayer === this) {
+                window.truePlayerManager.activePlayer = null;
+                window.truePlayerManager.previouslyActivePlayer = this;
             }
 
             this.stopSong(song, true);
