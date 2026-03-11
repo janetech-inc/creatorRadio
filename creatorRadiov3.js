@@ -488,39 +488,24 @@
             self.unlockAudioContext();
             
             const continuePlay = function () {
-                window.truePlayerManager.activePlayer &&
-                window.truePlayerManager.activePlayer !== self &&
-                window.truePlayerManager.activePlayer.pauseCurrentSong();
-        
+                window.truePlayerManager.activePlayer && window.truePlayerManager.activePlayer !== self && window.truePlayerManager.activePlayer.pauseCurrentSong();
+
                 self.pauseButton.show();
                 self.playButton.hide();
-        
+
                 if (self.deckA) self.deckA.audio.volume = self.getVolume();
                 if (self.deckB) self.deckB.audio.volume = self.getVolume();
-        
+
                 window.truePlayerManager.activePlayer = self;
-        
+
                 const current = self.getCurrentSong();
                 const next = self.getNextSong() || current;
-        
                 self.settings.crossfadeDuration = self.fadeTime(current.type, next.type);
-        
-                // rebuild decks cleanly after pause/resume
-                self.activeDeck.song = null;
-                self.nextDeck.song = null;
-        
-                self.loadSongIntoDeck(self.activeDeck, current, current.offset || 0);
-                self.loadSongIntoDeck(self.nextDeck, next, 0);
-        
-                const p = self.activeDeck.audio.play();
-                if (p && p.catch) p.catch(err => console.warn("Playback failed:", err));
-        
-                self.activeDeck.gainNode.gain.cancelScheduledValues(audioContext.currentTime);
-                self.activeDeck.gainNode.gain.setValueAtTime(1, audioContext.currentTime);
-        
-                self._fadeStarted = false;
-                self._isCrossfading = false;
-        
+
+                self.preloadSong(next);              // ensure next deck is ready
+                self.preloadPlayCurrentSong();       // start current deck
+                self.preloadSong(self.getNextSong()); // rebuild pipeline after resume
+
                 self.setPlayerState("playing", current);
             };
 
