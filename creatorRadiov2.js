@@ -278,6 +278,7 @@
         
                     audio.src = silent;
                     audio.muted = true;
+                    
         
                     audio.play()
                         .then(() => {
@@ -770,6 +771,8 @@
             song.audio.muted = false;
             song.audio.playsInline = true;
             song.audio.setAttribute("playsinline", "");
+
+            song.audio.load();
            const playPromise = song.audio.play();
 
             if (fadeTime > 0) {
