@@ -51,7 +51,7 @@
 
         this.audio = new Audio();
         this.audio.crossOrigin = "anonymous";
-        thia.audio.preload = "auto";
+        this.audio.preload = "auto";
         this.audio.setAttribute("playsinline", "true");
         this.audio.setAttribute("webkit-playsinline", "true");
         
