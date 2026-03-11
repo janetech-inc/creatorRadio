@@ -258,41 +258,6 @@
             }, { once: true });
            
         },
-
-         unlockAllAudio() {
-        
-            if (this._audioUnlocked) return;
-        
-            const ctx = audioContext;
-            if (ctx.state !== "running") {
-                ctx.resume();
-            }
-        
-            const silent = "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAA";
-        
-            this.songs.forEach(song => {
-                try {
-                    const audio = song.audio;
-        
-                    const originalSrc = audio.src;
-        
-                    audio.src = silent;
-                    audio.muted = true;
-                    
-        
-                    audio.play()
-                        .then(() => {
-                            audio.pause();
-                            audio.src = originalSrc;
-                            audio.muted = false;
-                        })
-                        .catch(()=>{});
-        
-                } catch(e){}
-            });
-        
-            this._audioUnlocked = true;
-        },
                 
         preloadPlayCurrentSong() {
             const song = this.getCurrentSong();
@@ -380,12 +345,30 @@
             this._volume = t,
             this.getCurrentSong().audio.volume = t
         },
+
+        unlockAudioContext() {
+
+            const ctx = audioContext;
+        
+            if (ctx.state === "running") return;
+        
+            const oscillator = ctx.createOscillator();
+            const gain = ctx.createGain();
+        
+            gain.gain.value = 0;
+        
+            oscillator.connect(gain);
+            gain.connect(ctx.destination);
+        
+            oscillator.start();
+            oscillator.stop(ctx.currentTime + 0.01);
+        
+            ctx.resume();
+        },
+                
         playCurrentSong: function() {
 
-            if (!this._audioUnlocked) {
-                this.unlockAllAudio();
-                this._audioUnlocked = true;
-            }
+            this.unlockAudioContext();
 
             e.truePlayerManager.activePlayer && e.truePlayerManager.activePlayer != this && e.truePlayerManager.activePlayer.pauseCurrentSong(),
             this.pauseButton.show(),
