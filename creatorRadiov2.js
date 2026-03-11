@@ -292,7 +292,7 @@
             });
         
             this._audioUnlocked = true;
-        }
+        },
                 
         preloadPlayCurrentSong() {
             const song = this.getCurrentSong();
