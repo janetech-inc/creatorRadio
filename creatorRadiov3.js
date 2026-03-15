@@ -361,20 +361,14 @@
         loadSongIntoDeck: function (deck, song, offset = 0) {
             if (!song) return;
 
-     
-
-          //   const sourceEl = song.audio.querySelector("source");
-           // const src = sourceEl ? sourceEl.src : song.audio.currentSrc || song.audio.src || "";
-            //const type = sourceEl ? (sourceEl.type || "") : (song.audio.type || "");
-
-          if (deck.song !== song) {
+            deck.song = song;
+            
+            if (!deck.audio.src || !deck.audio.src.includes(song.url)) {
                 deck.audio.pause();
                 deck.audio.src='';
                 deck.audio.load();   // reset element
                 deck.audio.src = song.url;
             }
-
-            deck.song = song;
             
             try {
                 deck.audio.currentTime = offset;
@@ -933,7 +927,7 @@
 
         playNextSong: function (skip = false) {
             if (this.songs.length <= 1) return;
-            if (this.getPlayerState() === "paused") return;
+            if (this.getPlayerState() === "paused" && !skip) return;
 
             const currentSong = this.getCurrentSong();
             const currentIndex = this.getCurrentSongIndex();
