@@ -273,6 +273,9 @@
             deck.audio.addEventListener("emptied", () => console.log("AUDIO EMPTIED"));
             
             deck.audio.addEventListener("loadedmetadata", function () {
+
+                if (!deck.song) return;
+                
                 const mins = parseInt(deck.audio.duration / 60, 10);
                 let secs = parseInt(deck.audio.duration % 60, 10);
                 secs = secs >= 10 ? secs : "0" + secs;
