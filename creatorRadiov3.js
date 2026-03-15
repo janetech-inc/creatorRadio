@@ -56,7 +56,9 @@
         this.audio.setAttribute("preload", "auto");
         this.audio.setAttribute("playsinline", "true");
         this.audio.setAttribute("webkit-playsinline", "true");
+        audio.setAttribute("x-webkit-airplay", "allow");
         this.audio.controls = false;
+        audio.setAttribute("controls", "");
         this.audio.loop = false;
 
         const source = document.createElement("source");
@@ -391,7 +393,7 @@
                 deck.audio.src = src;
                 deck.sourceUrl = src;
                 deck.sourceType = type;
-                deck.audio.load();
+            //    deck.audio.load();
             }
 
             try {
