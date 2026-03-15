@@ -58,7 +58,7 @@
         this.audio.setAttribute("webkit-playsinline", "true");
         this.audio.setAttribute("x-webkit-airplay", "allow");
         this.audio.controls = false;
-        audio.setAttribute("controls", "");
+        this.audio.setAttribute("controls", "");
         this.audio.loop = false;
 
         const source = document.createElement("source");
