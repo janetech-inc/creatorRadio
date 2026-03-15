@@ -49,29 +49,6 @@
         this.$elem.attr("data-true-audio-player-song-id", this.id);
         this.$parentElem = null;
 
-        /*
-        this.audio = new Audio();
-        this.audio.crossOrigin = "anonymous";
-        this.audio.preload = "auto";
-        this.audio.autoplay = false;
-        this.audio.setAttribute("preload", "auto");
-        this.audio.setAttribute("playsinline", "true");
-        this.audio.setAttribute("webkit-playsinline", "true");
-        this.audio.setAttribute("x-webkit-airplay", "allow");
-        this.audio.controls = false;
-        this.audio.setAttribute("controls", "");
-        this.audio.loop = false;
-
-        const source = document.createElement("source");
-        source.setAttribute("src", url);
-        if (mimeType) {
-            mimeType = mimeType.replace("\\", "/");
-            source.setAttribute("type", mimeType);
-        }
-        this.audio.append(source); */
-
-       // document.body.appendChild(this.audio);
-
         this.url = url;
         this.title = "";
         this.artist = "";
@@ -167,7 +144,6 @@
             self.$volumeBar.width("100%");
 
              document.addEventListener("visibilitychange", () => {
-            
                 if (document.hidden) {
                     if (audioContext.state === "suspended") {
                         audioContext.resume();
@@ -294,7 +270,6 @@
             deck.audio.addEventListener("waiting", () => console.log("AUDIO WAITING"));
             deck.audio.addEventListener("suspend", () => console.log("AUDIO SUSPEND"));
             deck.audio.addEventListener("emptied", () => console.log("AUDIO EMPTIED"));
-
             
             deck.audio.addEventListener("loadedmetadata", function () {
                 const mins = parseInt(deck.audio.duration / 60, 10);
@@ -312,14 +287,6 @@
             });
 
             deck.audio.addEventListener("timeupdate", function () {
-
-              /*  console.log("PLAYBACK", {
-                    playbackRate: deck?.audio?.playbackRate,
-                    currentTime: deck?.audio?.currentTime,
-                    paused: deck?.audio?.paused,
-                    readyState: deck?.audio?.readyState
-                }); */
-
                 
                 if (deck !== self.activeDeck) return;
                 if (self.isDragging || self.getPlayerState() === "paused") return;
@@ -337,8 +304,6 @@
                     if (self._fadeStarted) return;
                     self._fadeStarted = true;
                     self.playNextSong(false);
-                } else {
-                   // self.preloadSong(self.getNextSong());
                 }
             });
 
@@ -1001,8 +966,6 @@
 
             setTimeout(() => {
 
-               // if (this.getPlayerState() === "paused") return;
-
                 outgoingDeck.audio.pause();
                 outgoingDeck.gainNode.gain.setValueAtTime(0, audioContext.currentTime);
 
@@ -1011,9 +974,7 @@
 
                 this.setCurrentSong(nextIndex, false);
                 this.setPlayerState("playing", nextSong);
-
-                //this.preloadSong(this.getNextSong());
-
+                
                 this._isCrossfading = false;
                 this._fadeStarted = false;
             }, Math.max(fadeTime, 0.05) * 1000);
