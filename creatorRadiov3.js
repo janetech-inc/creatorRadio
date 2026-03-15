@@ -14,6 +14,9 @@
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
     audioContext.onstatechange = () => {
+
+        console.log("AUDIO CONTEXT STATE:", audioContext.state);
+
          if (audioContext.state === "interrupted" || audioContext.state === "suspended") {
     
             setTimeout(() => {
@@ -290,7 +293,21 @@
         bindDeckEvents: function (deck) {
             const self = this;
 
+            deck.audio.addEventListener("stalled", () => console.log("AUDIO STALLED"));
+            deck.audio.addEventListener("waiting", () => console.log("AUDIO WAITING"));
+            deck.audio.addEventListener("suspend", () => console.log("AUDIO SUSPEND"));
+            deck.audio.addEventListener("emptied", () => console.log("AUDIO EMPTIED"));
+
             deck.audio.addEventListener("timeupdate", function () {
+
+                console.log("PLAYBACK", {
+                    playbackRate: deck?.audio?.playbackRate,
+                    currentTime: deck?.audio?.currentTime,
+                    paused: deck?.audio?.paused,
+                    readyState: deck?.audio?.readyState
+                });
+
+                
                 if (deck !== self.activeDeck) return;
                 if (self.isDragging || self.getPlayerState() === "paused") return;
                 if (!deck.song) return;
