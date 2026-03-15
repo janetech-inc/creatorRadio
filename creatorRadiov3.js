@@ -401,7 +401,6 @@
           if (deck.song !== song) {
                 deck.audio.pause();
                 deck.audio.src='';
-                deck.audio.removeAttribute("src");
                 deck.audio.load();   // reset element
                 deck.audio.src = song.url;
             }
