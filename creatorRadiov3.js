@@ -51,7 +51,9 @@
 
         this.audio = new Audio();
         this.audio.crossOrigin = "anonymous";
-        this.audio.preload = "none";
+        this.audio.preload = "auto";
+        this.audio.autoplay = false;
+        this.audio.setAttribute("preload", "auto");
         this.audio.setAttribute("playsinline", "true");
         this.audio.setAttribute("webkit-playsinline", "true");
         this.audio.controls = false;
@@ -997,7 +999,7 @@
                 this.setCurrentSong(nextIndex, false);
                 this.setPlayerState("playing", nextSong);
 
-                this.preloadSong(this.getNextSong());
+                //this.preloadSong(this.getNextSong());
 
                 this._isCrossfading = false;
                 this._fadeStarted = false;
