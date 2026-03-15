@@ -48,7 +48,7 @@
 
         this.audio = new Audio();
         this.audio.crossOrigin = "anonymous";
-        this.audio.preload = "metadata";
+        this.audio.preload = "none";
         this.audio.setAttribute("playsinline", "true");
         this.audio.setAttribute("webkit-playsinline", "true");
         this.audio.controls = false;
