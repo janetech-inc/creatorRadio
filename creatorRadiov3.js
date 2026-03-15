@@ -325,7 +325,7 @@
                     self._fadeStarted = true;
                     self.playNextSong(false);
                 } else {
-                    self.preloadSong(self.getNextSong());
+                   // self.preloadSong(self.getNextSong());
                 }
             });
 
