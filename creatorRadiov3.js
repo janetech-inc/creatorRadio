@@ -69,7 +69,7 @@
         }
         this.audio.append(source);
 
-       // document.body.appendChild(this.audio);
+        document.body.appendChild(this.audio);
 
         this.title = "";
         this.artist = "";
@@ -200,8 +200,8 @@
                 const mediaSource = audioContext.createMediaElementSource(audio);
                 const gainNode = audioContext.createGain();
 
-              //  mediaSource.connect(gainNode);
-               // gainNode.connect(audioContext.destination);
+                mediaSource.connect(gainNode);
+                gainNode.connect(audioContext.destination);
                 gainNode.gain.setValueAtTime(0, audioContext.currentTime);
 
                 return {
