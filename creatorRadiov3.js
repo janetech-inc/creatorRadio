@@ -306,12 +306,12 @@
 
             deck.audio.addEventListener("timeupdate", function () {
 
-                console.log("PLAYBACK", {
+              /*  console.log("PLAYBACK", {
                     playbackRate: deck?.audio?.playbackRate,
                     currentTime: deck?.audio?.currentTime,
                     paused: deck?.audio?.paused,
                     readyState: deck?.audio?.readyState
-                });
+                }); */
 
                 
                 if (deck !== self.activeDeck) return;
