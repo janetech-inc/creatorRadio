@@ -49,6 +49,7 @@
         this.$elem.attr("data-true-audio-player-song-id", this.id);
         this.$parentElem = null;
 
+        /*
         this.audio = new Audio();
         this.audio.crossOrigin = "anonymous";
         this.audio.preload = "auto";
@@ -67,10 +68,11 @@
             mimeType = mimeType.replace("\\", "/");
             source.setAttribute("type", mimeType);
         }
-        this.audio.append(source);
+        this.audio.append(source); */
 
-        document.body.appendChild(this.audio);
+       // document.body.appendChild(this.audio);
 
+        this.url = url;
         this.title = "";
         this.artist = "";
         this.album = "";
@@ -101,21 +103,6 @@
         this.getAudioContext = function () {
             return audioContext;
         };
-
-        this.audio.addEventListener("loadedmetadata", function () {
-            const mins = parseInt(song.audio.duration / 60, 10);
-            let secs = parseInt(song.audio.duration % 60, 10);
-            secs = secs >= 10 ? secs : "0" + secs;
-            song.durationString = mins + ":" + secs;
-
-            if (song.$parentElem) {
-                song.$parentElem.find('[tmplayer-interaction="populate-duration"]').text(song.durationString);
-            }
-
-            if (player.getCurrentSong() === song) {
-                player.$duration.text(song.durationString);
-            }
-        });
     }
 
     function Player(elem, options) {
@@ -196,7 +183,13 @@
                 audio.preload = "auto";
                 audio.setAttribute("playsinline", "true");
                 audio.setAttribute("webkit-playsinline", "true");
+                audio.setAttribute("x-webkit-airplay", "allow");
+                audio.controls = false;
+                audio.setAttribute("controls", "");
+                audio.loop = false;
 
+                document.body.appendChild(audio);
+                
                 const mediaSource = audioContext.createMediaElementSource(audio);
                 const gainNode = audioContext.createGain();
 
@@ -210,8 +203,6 @@
                     mediaSource,
                     gainNode,
                     song: null,
-                    sourceUrl: "",
-                    sourceType: ""
                 };
             };
 
@@ -304,6 +295,22 @@
             deck.audio.addEventListener("suspend", () => console.log("AUDIO SUSPEND"));
             deck.audio.addEventListener("emptied", () => console.log("AUDIO EMPTIED"));
 
+            
+            deck.audio.addEventListener("loadedmetadata", function () {
+                const mins = parseInt(deck.audio.duration / 60, 10);
+                let secs = parseInt(deck.audio.duration % 60, 10);
+                secs = secs >= 10 ? secs : "0" + secs;
+                deck.song.durationString = mins + ":" + secs;
+    
+                if (deck.song.$parentElem) {
+                    deck.song.$parentElem.find('[tmplayer-interaction="populate-duration"]').text(deck.song.durationString);
+                }
+    
+                if (self.getCurrentSong() === deck.song) {
+                    player.$duration.text(deck.song.durationString);
+                }
+            });
+
             deck.audio.addEventListener("timeupdate", function () {
 
               /*  console.log("PLAYBACK", {
@@ -387,15 +394,16 @@
 
             deck.song = song;
 
-            const sourceEl = song.audio.querySelector("source");
-            const src = sourceEl ? sourceEl.src : song.audio.currentSrc || song.audio.src || "";
-            const type = sourceEl ? (sourceEl.type || "") : (song.audio.type || "");
+          //   const sourceEl = song.audio.querySelector("source");
+           // const src = sourceEl ? sourceEl.src : song.audio.currentSrc || song.audio.src || "";
+            //const type = sourceEl ? (sourceEl.type || "") : (song.audio.type || "");
 
-            if (deck.sourceUrl !== src || deck.sourceType !== type) {
-                deck.audio.src = src;
-                deck.sourceUrl = src;
-                deck.sourceType = type;
-            //    deck.audio.load();
+          if (deck.song !== song) {
+                deck.audio.pause();
+                deck.audio.src='';
+                deck.audio.removeAttribute("src");
+                deck.audio.load();   // reset element
+                deck.audio.src = song.url;
             }
 
             try {
