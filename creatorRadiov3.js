@@ -56,7 +56,7 @@
         this.audio.setAttribute("preload", "auto");
         this.audio.setAttribute("playsinline", "true");
         this.audio.setAttribute("webkit-playsinline", "true");
-        audio.setAttribute("x-webkit-airplay", "allow");
+        this.audio.setAttribute("x-webkit-airplay", "allow");
         this.audio.controls = false;
         audio.setAttribute("controls", "");
         this.audio.loop = false;
@@ -68,6 +68,8 @@
             source.setAttribute("type", mimeType);
         }
         this.audio.append(source);
+
+       // document.body.appendChild(this.audio);
 
         this.title = "";
         this.artist = "";
