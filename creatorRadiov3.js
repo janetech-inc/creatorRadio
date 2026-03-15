@@ -307,7 +307,7 @@
                 }
     
                 if (self.getCurrentSong() === deck.song) {
-                    player.$duration.text(deck.song.durationString);
+                    self.$duration.text(deck.song.durationString);
                 }
             });
 
@@ -392,7 +392,7 @@
         loadSongIntoDeck: function (deck, song, offset = 0) {
             if (!song) return;
 
-            deck.song = song;
+     
 
           //   const sourceEl = song.audio.querySelector("source");
            // const src = sourceEl ? sourceEl.src : song.audio.currentSrc || song.audio.src || "";
@@ -406,6 +406,8 @@
                 deck.audio.src = song.url;
             }
 
+            deck.song = song;
+            
             try {
                 deck.audio.currentTime = offset;
             } catch (err) {
