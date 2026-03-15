@@ -161,8 +161,9 @@
                 audio.setAttribute("webkit-playsinline", "true");
                 audio.setAttribute("x-webkit-airplay", "allow");
                 audio.controls = false;
-                audio.setAttribute("controls", "");
+                audio.setAttribute("controls", false);
                 audio.loop = false;
+                audio.style.display = "none";
 
                 document.body.appendChild(audio);
                 
